@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+  - "8"
+script:
+  - echo 'Starting Build!'
+  - echo 'Installing Deps!'
+  - yarn
+  - echo 'Testing!'
+  - yarn test
+  - echo 'Checking Bundle Size!'
+  - yarn test:bundlesize
+deploy:
+  on:
+    tags: true
+  provider: npm
+  email: "$EMAIL_ADDRESS"
+  api_key: "$AUTH_TOKEN"
