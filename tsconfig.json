@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "outDir": "./lib",
-    "allowJs": true,
-    "checkJs": true,
-    "target": "es5",
+    // "allowJs": true,
+    // "checkJs": true,
+    "target": "ES2018",
+    "lib": ["ES2018", "DOM"],
     "jsx": "preserve"
   },
   "include": ["./src/**/*"]
