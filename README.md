@@ -2,11 +2,14 @@
   <img src="https://unpkg.com/brahmos@0.5.0/brahmos.svg" alt="Brahmos.js" width="250">
 </p>
 
-# Brahmos
+# TeLi
 
 Supercharged JavaScript library to build user interfaces with modern React API and native templates.
 
-Brahmos supports all the APIs of React including the upcoming concurrent mode APIs and the existing ones. It has its own custom fiber architecture and concurrent mode implementation to support the concurrent UI patterns.
+TeLi supports all the APIs of React including the upcoming concurrent mode APIs and the existing ones. It has its own custom fiber architecture and concurrent mode implementation to support the concurrent UI patterns.
+
+forked from [brahmosjs/brahmos](https://github.com/brahmosjs/brahmos)
+
 
 ## Features
 
@@ -16,15 +19,11 @@ Brahmos supports all the APIs of React including the upcoming concurrent mode AP
 - Smaller transpiled footprint of your source code, than traditional JSX.
 
 ## Installation
-### Create Brahmos App
-Use [Create a New Brahmos App](https://www.npmjs.com/package/create-brahmos-app) if you're looking for a powerful JavaScript toolchain.
 
-### Manual installation
-
-Add `brahmos` as dependency. And `babel-plugin-brahmos` as dev dependency.
+Add `teli` as a dependency. And `esbuild` and others as dev dependencies.
 ```
-npm install brahmos
-npm install babel-plugin-brahmos --save-dev
+npm install teli
+npm install -D esbuild acorn acorn-jsx astring
 ```
 
 Add brahmos in your babel config.
