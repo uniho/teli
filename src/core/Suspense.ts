@@ -37,7 +37,7 @@ type LazyComponentModule = {
   default: ClassComponent | FunctionalComponent,
 };
 
-export function getClosestSuspenseFiber(fiber: Fiber, includeSuspenseList: boolean): ?Fiber {
+export function getClosestSuspenseFiber(fiber: Fiber, includeSuspenseList: boolean): Fiber | null | undefined {
   const { root } = fiber;
   let { nodeInstance } = fiber;
   while (
@@ -138,15 +138,13 @@ class SuspenseManager {
 
   childManagers: Array<SuspenseManager>;
 
-  suspender: ?Promise<any>;
+  suspender: Promise<any> | null | undefined;
 
   isSuspenseList: boolean;
 
-  parentSuspenseManager: ?SuspenseManager;
+  parentSuspenseManager: SuspenseManager | null | undefined;
 
   rootSuspenseManager: SuspenseManager;
-
-  handleSuspense: () => Promise<any>;
 
   constructor(fiber, transition) {
     const { nodeInstance } = fiber;

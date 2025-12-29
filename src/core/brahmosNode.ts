@@ -61,7 +61,7 @@ export function getKey(node: BrahmosNode, index: number): number | string {
   return key === undefined ? index : key;
 }
 
-export function brahmosNode(props: ?ObjectLiteral, values: ?Array<any>, key?: string): BrahmosNode {
+export function brahmosNode(props: ObjectLiteral | null | undefined, values: Array<any> | null | undefined, key?: string): BrahmosNode {
   return {
     $$typeof: REACT_ELEMENT,
     /** Common node properties */

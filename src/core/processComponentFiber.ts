@@ -28,7 +28,7 @@ import type {
   ClassComponentUpdate,
 } from './flow.types';
 
-export function getErrorBoundaryFiber(fiber: Fiber): ?Fiber {
+export function getErrorBoundaryFiber(fiber: Fiber): Fiber | null | undefined {
   const { root } = fiber;
 
   while (
@@ -144,8 +144,8 @@ export default function processComponentFiber(fiber: Fiber): void {
    * and call all the life cycle method which comes before rendering.
    */
   if (isClassComponent) {
-    const componentClassInstance = ((nodeInstance: any): ComponentClassInstance);
-    const classBrahmosData = ((brahmosData: any): ClassComponentBrahmosData);
+    const componentClassInstance = nodeInstance as ComponentClassInstance;
+    const classBrahmosData = brahmosData as ClassComponentBrahmosData;
     const { committedValues, memoizedValues } = classBrahmosData;
 
     // if it is first render we should store the initial state on committedValues
@@ -177,7 +177,7 @@ export default function processComponentFiber(fiber: Fiber): void {
     let state = prevState;
 
     // apply the pending updates in state if
-    const pendingUpdates = ((getPendingUpdates(fiber): any): Array<ClassComponentUpdate>);
+    const pendingUpdates = getPendingUpdates(fiber) as Array<ClassComponentUpdate>;
     if (pendingUpdates.length) state = getUpdatedState(prevState, pendingUpdates);
 
     const checkShouldUpdate = !isFirstRender && root.forcedUpdateWith !== nodeInstance;
@@ -325,8 +325,8 @@ export default function processComponentFiber(fiber: Fiber): void {
       // if it class component reset the state and prop to committed value
       const brahmosData = nodeInstance[BRAHMOS_DATA_KEY];
       if (isClassComponent && isDeferredUpdate) {
-        const { committedValues } = ((brahmosData: any): ClassComponentBrahmosData);
-        Object.assign(((nodeInstance: any): ComponentClassInstance), committedValues);
+        const { committedValues } = brahmosData as ClassComponentBrahmosData;
+        Object.assign(nodeInstance as ComponentClassInstance, committedValues);
       }
     }
   }

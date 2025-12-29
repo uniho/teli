@@ -31,7 +31,7 @@ function flattenChildren(children) {
   return _children;
 }
 
-function getChildrenArray(children: any): ?Array<any> {
+function getChildrenArray(children: any): Array<any> | null | undefined {
   if (isNil(children)) return undefined;
   else if (typeof children === 'boolean') return [];
 
@@ -62,7 +62,7 @@ function getChildrenArray(children: any): ?Array<any> {
   return _children;
 }
 
-function map(children: any, cb: ArrayCallback): ?Array<any> {
+function map(children: any, cb: ArrayCallback): Array<any> | null | undefined {
   const _children = getChildrenArray(children);
   if (!_children) return children;
   return _children.map(cb);
@@ -110,7 +110,7 @@ export function isValidElement(node: any) {
   return node && (isComponentNode(node) || isTagElementNode(node));
 }
 
-export function cloneElement(node: any, props: ObjectLiteral): ?BrahmosNode {
+export function cloneElement(node: any, props: ObjectLiteral): BrahmosNode | null | undefined {
   // extend props can be undefined, so have default value for it
   props = props || {};
 

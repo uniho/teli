@@ -157,7 +157,7 @@ function defaultReduce<H, R>(hook: H): H | R {
   return hook;
 }
 
-function getHook<+H, R>(
+function getHook<H, R>(
   createHook: () => H,
   shouldUpdate: (hook: H) => boolean,
   reduce: (hook: H) => R,
@@ -193,7 +193,7 @@ export function prepareHooksForRender() {
   }
 
   // call all the pending update before trying to render,
-  const pendingUpdates = ((getPendingUpdates(fiber): any): Array<FunctionalComponentUpdate>);
+  const pendingUpdates = getPendingUpdates(fiber) as Array<FunctionalComponentUpdate>;
   pendingUpdates.forEach((task) => task.updater());
 }
 
@@ -358,7 +358,7 @@ function useEffectBase(effectHandler, dependencies) {
 /**
  * Use effect hook
  */
-export function useEffect(callback: () => ?Function, dependencies: Array<any>): void {
+export function useEffect(callback: () => Function | null | undefined, dependencies: Array<any>): void {
   useEffectBase((hook) => {
     /**
      * Run effect asynchronously after the paint cycle is finished
@@ -376,7 +376,7 @@ export function useEffect(callback: () => ?Function, dependencies: Array<any>): 
   }, dependencies);
 }
 
-export function useLayoutEffect(callback: () => ?Function, dependencies: Array<any>): void {
+export function useLayoutEffect(callback: () => Function | null | undefined, dependencies: Array<any>): void {
   useEffectBase((hook) => {
     // run effect synchronously
     hook.cleanEffect = callback();
@@ -430,8 +430,12 @@ export function useContext(Context: ContextType): any {
 /**
  * Transition hook
  */
-export function useTransition({ timeoutMs }: TransitionOptions): UseTransitionResult {
-  const component = getCurrentComponent();
+export function useTransition(options): UseTransitionResult {
+  /**
+   * Set default timeout to 3000ms if not specified.
+   * This ensures a consistent UX and acts as a safety net for pending states.
+   */
+  const timeoutMs = (options && options.timeoutMs !== undefined) ? options.timeoutMs : 3000;  const component = getCurrentComponent();
 
   return getHook(
     () => {
@@ -501,8 +505,12 @@ export function useTransition({ timeoutMs }: TransitionOptions): UseTransitionRe
     },
     defaultShouldUpdate,
     ({ startTransition, isPending }: Transition): UseTransitionResult => [
-      startTransition,
+      /**
+       * Reordered the return value to [isPending, startTransition] 
+       * to match the modern React API signature.
+       */
       isPending,
+      startTransition,
     ],
   );
 }
@@ -510,8 +518,9 @@ export function useTransition({ timeoutMs }: TransitionOptions): UseTransitionRe
 /**
  * A hook to have deferred value
  */
-export function useDeferredValue(value: any, { timeoutMs }: DeferredValueHookOptions): any {
-  const [startTransition] = useTransition({ timeoutMs });
+export function useDeferredValue(value: any, options): any {
+  const timeoutMs = (options && options.timeoutMs !== undefined) ? options.timeoutMs : 3000;
+  const [, startTransition] = useTransition({ timeoutMs });
   const [deferredValue, setDeferredValue] = useState(value);
   const timeStampRef = useRef(0);
 
@@ -538,7 +547,7 @@ export function useDeferredValue(value: any, { timeoutMs }: DeferredValueHookOpt
     startTransition(() => {
       setDeferredValue(value);
     });
-  }, [value]);
+  }, [value, startTransition]);
 
   return deferredValue;
 }

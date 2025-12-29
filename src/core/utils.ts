@@ -134,7 +134,7 @@ export function remove(nodes: Array<Node> | Node): void {
  * Convert an array like object to array
  */
 
-export function toArray(list: Iterable<any>, start: ?number) {
+export function toArray(list: Iterable<any>, start: number | null | undefined) {
   start = start || 0;
   return Array.prototype.slice.call(list, start);
 }
@@ -172,7 +172,7 @@ export function changeToNode(value: Array<Node> | NodeList<Node> | Node | string
  * Function to add child nodes before endNode, if it is not defined or null
  * It will add nodes on the last
  */
-export function insertBefore(parent: Element, end: ?Node, value: any): Array<Node> {
+export function insertBefore(parent: Element, end: Node | null | undefined, value: any): Array<Node> {
   const node = changeToNode(value);
 
   /**
@@ -195,7 +195,7 @@ export function insertBefore(parent: Element, end: ?Node, value: any): Array<Nod
 }
 
 // function to get next sibling based on parent node and previous sibling
-export function getNextSibling(parentNode: Element, previousSibling: ?Node): ?Node {
+export function getNextSibling(parentNode: Element, previousSibling: Node | null | undefined): Node | null | undefined {
   return previousSibling ? previousSibling.nextSibling : parentNode.firstChild;
 }
 
@@ -217,7 +217,7 @@ export function mergeState(state: ObjectLiteral, newState: any): ObjectLiteral {
 /**
  * Function to call life cycle of a given component, or component instance
  */
-export function callLifeCycle(object: any, method: string, args: ?Array<any>): void {
+export function callLifeCycle(object: any, method: string, args: Array<any> | null | undefined): void {
   if (object[method]) {
     return object[method].apply(object, args);
   }
@@ -226,7 +226,7 @@ export function callLifeCycle(object: any, method: string, args: ?Array<any>): v
 /**
  * Create an empty text node before a given node
  */
-export function createEmptyTextNode(parent: Node, index: number): ?Node {
+export function createEmptyTextNode(parent: Node, index: number): Node | null | undefined {
   const nextSibling = index === 0 ? parent.firstChild : parent.childNodes[index];
 
   const textNode = document.createTextNode('');

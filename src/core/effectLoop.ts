@@ -86,7 +86,7 @@ function setFirstNodeReference(part: Part, firstDOMNode: Node) {
   }
 }
 
-function getCorrectPreviousSibling(part: NodePart | ArrayPart): ?Node {
+function getCorrectPreviousSibling(part: NodePart | ArrayPart): Node | null | undefined {
   let { previousSibling } = part;
 
   /**

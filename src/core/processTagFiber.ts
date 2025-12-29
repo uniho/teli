@@ -40,7 +40,7 @@ function partsToFiber(parts, values, parentFiber) {
       let refValue;
       while (part && domNode === part.domNode) {
         loopEntries(values[i], (attrName, attrValue) => {
-          const attributePart = ((part: any): AttributePart);
+          const attributePart = part as AttributePart;
           const effectiveAttrName = getEffectiveAttrName(attrName);
           const isOverridden = isAttrOverridden(
             attributePart.tagAttrs,

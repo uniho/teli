@@ -29,7 +29,7 @@ import type {
 
 let currentComponentFiber;
 
-export function setCurrentComponentFiber(fiber: ?Fiber) {
+export function setCurrentComponentFiber(fiber: Fiber | null | undefined) {
   currentComponentFiber = fiber;
 }
 
@@ -77,7 +77,7 @@ export function markPendingEffect(fiber: Fiber, effectType: EffectType) {
 
 export function cloneCurrentFiber(
   fiber: Fiber,
-  wipFiber: ?Fiber,
+  wipFiber: Fiber | null | undefined,
   refFiber: Fiber,
   parentFiber: Fiber,
 ): Fiber {
@@ -128,7 +128,7 @@ export function cloneCurrentFiber(
   return wipFiber;
 }
 
-export function getNextChildFiber(refFiber: Fiber, parentFiber: Fiber): ?Fiber {
+export function getNextChildFiber(refFiber: Fiber, parentFiber: Fiber): Fiber | null | undefined {
   return refFiber === parentFiber ? refFiber.child : refFiber.sibling;
 }
 
@@ -244,7 +244,7 @@ export function addAlternates(current: Fiber, wip: Fiber): void {
 export function createAndLink(
   node: any,
   part: Part,
-  currentFiber: ?Fiber,
+  currentFiber: Fiber | null | undefined,
   refFiber: Fiber,
   parentFiber: Fiber,
 ): Fiber {

@@ -4,7 +4,7 @@ import { toArray, createEmptyTextNode, addDataContainer, remove } from './utils'
 
 import type { TemplateNodeType, TemplateTagType, Part, NodePart } from './flow.types';
 
-function isBrahmosCommentNode(node: ?Node): boolean {
+function isBrahmosCommentNode(node: Node | null | undefined): boolean {
   return !!node && node.nodeType === 8 && node.textContent === BRAHMOS_PLACEHOLDER;
 }
 

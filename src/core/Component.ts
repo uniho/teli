@@ -18,7 +18,7 @@ export class Component implements ComponentInstance {
 
   props: ObjectLiteral;
 
-  state: ?ObjectLiteral;
+  state: ObjectLiteral | null | undefined;
 
   context: any;
   isReactComponent: boolean;

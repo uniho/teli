@@ -38,13 +38,13 @@ function decodePartMeta(partMetaCode: string): Array<PartMeta> {
 export default class TemplateTag implements TemplateTagType {
   $key: 'svgTemplate' | 'template';
 
-  $value: ?HTMLTemplateElement;
+  $value: HTMLTemplateElement | null | undefined;
 
   strings: Array<string>;
 
-  template: ?HTMLTemplateElement;
+  template: HTMLTemplateElement | null | undefined;
 
-  svgTemplate: ?HTMLTemplateElement;
+  svgTemplate: HTMLTemplateElement | null | undefined;
 
   partsMeta: Array<PartMeta>;
 

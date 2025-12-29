@@ -79,7 +79,7 @@ export function setTransitionComplete(transition: AnyTransition): void {
  */
 export function getTransitionFromFiber(
   fiber: Fiber,
-  defaultTransition: ?PredefinedTransition,
+  defaultTransition: PredefinedTransition | null | undefined,
 ): AnyTransition {
   defaultTransition = defaultTransition || PREDEFINED_TRANSITION_SYNC;
   // if there is currentTransition return that or else return SYNC transition
@@ -89,7 +89,7 @@ export function getTransitionFromFiber(
 /**
  * function to get first pending transition
  */
-export function getFirstTransitionToProcess(root: HostFiber): ?AnyTransition {
+export function getFirstTransitionToProcess(root: HostFiber): AnyTransition | null | undefined {
   const { pendingTransitions } = root;
   return pendingTransitions.find(shouldProcessTransition);
 }
