@@ -1,4 +1,4 @@
-// @flow
+// src/core/tearDown.ts
 import { callLifeCycle, remove, getNextSibling, isMounted } from './utils';
 
 import {
@@ -96,6 +96,13 @@ function tearDownFiber(fiber, removeDOM) {
   }
   // if its a component node and is mounted then call lifecycle methods
   else if (isComponentNode(node) && isMounted(nodeInstance)) {
+    /**
+     * Optional cleanup for fields.
+     */
+    if (typeof nodeInstance.__clearFields === 'function') {
+      nodeInstance.__clearFields();
+    }
+
     // for class component call componentWillUnmount and for functional comp clean effects
     if (node.nodeType === CLASS_COMPONENT_NODE) {
       callLifeCycle(nodeInstance, 'componentWillUnmount');
