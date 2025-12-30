@@ -97,10 +97,10 @@ function tearDownFiber(fiber, removeDOM) {
   // if its a component node and is mounted then call lifecycle methods
   else if (isComponentNode(node) && isMounted(nodeInstance)) {
     /**
-     * Optional cleanup for fields.
+     * Optional cleanup for Observers.
      */
     if (typeof nodeInstance.__clearFields === 'function') {
-      nodeInstance.__clearFields();
+      nodeInstance.__clearObservers();
     }
 
     // for class component call componentWillUnmount and for functional comp clean effects
