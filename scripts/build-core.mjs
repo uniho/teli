@@ -1,20 +1,17 @@
-// scripts/build-core.mjs
-import esbuild from 'esbuild';
+import esbuild from 'esbuild'
 
-const args = process.argv.slice(2);
-const isDev = args.includes('--dev');
-
-console.log(isDev ? '🚧 Building for Development...' : '🚀 Building for Production...');
-
+//
 await esbuild.build({
-  entryPoints: ['./src/core/index.js'],
+  entryPoints: [
+    "./src/core/index.js",
+  ],
+  outdir: 'dist',
   bundle: true,
-  outfile: './dist/index.js',
   format: 'esm',
   platform: 'browser',
   target: 'es2018',
-  minify: !isDev,
-  sourcemap: isDev,
-}).catch(() => process.exit(1));
+  sourcemap: false,
+  minify: true,
+})
 
-console.log('✅ Build success!');
+console.log('✅ build core complete')
