@@ -99,7 +99,13 @@ export function processFiber(fiber: Fiber) {
 }
 
 function shouldCommit(root) {
-  // if there is transition processed on work loop check if its completed
+
+  // commit immediately if there is "Sync Lane" 
+  if (root.updateType === UPDATE_TYPE_SYNC) {
+    return true; 
+  }
+
+  // if there is "Transition Lane" on work loop check if its completed
   if (root.currentTransition) {
     /**
      * all sync changes should be committed before committing transition,
@@ -113,8 +119,8 @@ function shouldCommit(root) {
     );
   }
 
-  // otherwise return true for sync commits
-  return true;
+  // there is "Idle Lane"
+  return false;
 }
 
 /**
