@@ -1,4 +1,3 @@
-// @flow
 
 import reRender from './reRender';
 import { getConsumerCallback } from './createContext';
