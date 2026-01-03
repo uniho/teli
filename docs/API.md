@@ -53,3 +53,41 @@ The following rules must be observed:
 * **Notification Responsibility**: It is the **resource's responsibility** to notify the engine when data changes.
 * **Re-render Guarantee**: Side effects may be executed during an update, provided they are triggered through the listener registered in `initWatch`, which guarantees a re-render.
 * **State Inconsistency**: Failing to notify the engine when the state changes leads to UI inconsistency and is considered a violation of these principles.
+
+
+## Jotai の使用例
+
+``` js
+import { Suspense, watch, initWatch } from 'potate'
+import {createStore, atom} from "jotai"
+
+// Your human rights (specifically your liberty) are fully guaranteed,
+// including the freedom to name this as you wish — such as a 'signal'.
+const createSignal = iniValue => {
+  const _store = createStore()
+  const _atom = atom(iniValue)
+  const f = () => _store.get(_atom)
+  f.set = newValue => _store.set(_atom, newValue)
+  f.sub = listner => _store.sub(_atom, listner)
+  f.atom = _atom
+  return f
+}
+
+const mySignal = createSignal({name: 'jyaga'})
+
+export props => {
+  return (<Suspense><Profile /></Suspense>)
+}
+
+const Profile = props => {
+  watch(resource)
+  const data = mySignal()
+  return (<div>Name: {data.name}</div>)
+}
+
+const resource = initWatch(listener => {
+  const unsubscribe = mySignal.sub(listener)
+  return unsubscribe
+})
+
+```
