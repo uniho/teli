@@ -2,11 +2,13 @@
   <img src="https://unpkg.com/brahmos@0.5.0/brahmos.svg" alt="Brahmos.js" width="250">
 </p>
 
-# TeLi
+# Potate
+
+**Po**wered by **Ta**gged **Te**mplate.
 
 Supercharged JavaScript library to build user interfaces with modern React API and native templates.
 
-TeLi supports all the APIs of React including the upcoming concurrent mode APIs and the existing ones. It has its own custom fiber architecture and concurrent mode implementation to support the concurrent UI patterns.
+Potate supports all the APIs of React including the upcoming concurrent mode APIs and the existing ones. It has its own custom fiber architecture and concurrent mode implementation to support the concurrent UI patterns.
 
 forked from [brahmosjs/brahmos](https://github.com/brahmosjs/brahmos)
 
@@ -20,10 +22,10 @@ forked from [brahmosjs/brahmos](https://github.com/brahmosjs/brahmos)
 
 ## Installation
 
-Add `teli` as a dependency. And `esbuild` and others as dev dependencies.
+Add `potate` as a dependency. And `esbuild` as a dev dependency.
 ```
 npm install teli
-npm install -D esbuild acorn acorn-jsx astring
+npm install -D esbuild
 ```
 
 Add brahmos in your babel config.
@@ -161,23 +163,6 @@ Taking advantage of this behavior Brahmos uses literal parts as a cache key to k
 Tagged template is natively supported by the browser, unlike the React's JSX which has to be transformed to React.createElement calls. So the output generated to run Brahmos has a smaller footprint than the output generated for the react.
 For the above example, the Brahmos output is 685 bytes, compared to 824 bytes from the React output. More the static part of an HTML, greater the difference will be.
 
-## Demo
-
-The following demo demonstrates the support of all the APIs coming in future version of React like Concurrent mode, suspense list, suspense for data fetch, and also for the existing APIs like states, hooks, context api, refs etc.
-
-[https://codesandbox.io/s/brahmos-demo-3t8r6](https://codesandbox.io/s/brahmos-demo-3t8r6)
-
-
-## Talk on the Idea of Brahmos
-
-<a href="https://www.youtube.com/watch?v=oYdVhIzPBr8&feature=youtu.be&ab_channel=BristolJS" target="_blank" rel="noopener">
-  <img src="https://unpkg.com/brahmos@0.10.0-alpha4/brahmos_talk.jpg" alt="Brahmos.js: React without VDOM"
-	title="Brahmos.js: React without VDOM" width="410px" />
-</a>
-
-## Slack Channel
-
-https://join.slack.com/t/brahmoscommunity/shared_invite/enQtODM5NDMwODgwMzQyLTc4YjJlZjY3Mzk1ODJkNTRkODljYjhmM2NhMGIxNzFjMjZjODk0MmVjZTVkNmE5Y2MwYzZkMzk5NTUxYmI5OWE
 
 ## Progress
 
@@ -194,8 +179,28 @@ https://join.slack.com/t/brahmoscommunity/shared_invite/enQtODM5NDMwODgwMzQyLTc4
 - [x] Concurrent Mode
 - [x] 3rd Party React library support (Tested React-router, redux, mobx, react-query, zustand, recharts)
 - [x] React Utilities and Methods
-- [ ] Handle server rendering
+- [x] Vite Plugin to transpile JSX to tagged templates
+- [x] Esbuild Plugin to transpile JSX to tagged templates
+- [x] Enhanced `useTransition` hook
+  *(Note: Currently seeking to remove the requirement for the `timeout` option)*
+- [x] Enhanced `useDeferredValue` hook
+  *(Note: Currently seeking to remove the `timeout` requirement and add support for initial values)*
+- [x] `use(resource)` API
+- [x] `watch(resource)` API
+- [ ] `use(context)` API
+- [ ] Support for `ref` as a prop
+- [ ] `startTransition(action)` for POST request.
 - [ ] Performance improvement
 - [ ] Bug fixes
 - [ ] Test Cases
+- [ ] Rewrite core source code with MoonBit
 
+
+## Out of Scope
+
+*The following features are not planned for the core roadmap (though contributors are welcome to explore them):*
+
+* Potate Server Components (PSC)
+* Potate Compiler
+* `useOptimistic` hook
+* Type definitions/Type safety: We do not prioritize or provide type information unless it directly impacts runtime execution safety.
