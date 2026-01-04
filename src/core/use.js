@@ -1,4 +1,4 @@
-// src/core/use.ts
+// src/core/use.js
 import { getCurrentComponentFiber } from './fiber';
 
 /**
