@@ -1,4 +1,4 @@
-// @flow
+
 import { getUniqueId } from './utils';
 import {
   UPDATE_SOURCE_TRANSITION,
