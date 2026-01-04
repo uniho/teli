@@ -129,8 +129,28 @@ export default function scheduleTask(
         return currentTime < slotEndTime;
       };
 
-      // If we cross max allowed retry we need to flush render synchronously
-      cb(tryCount > maxAllowedRetry ? timedOutRemaining : timeRemaining);
+      // // If we cross max allowed retry we need to flush render synchronously
+      // cb(tryCount > maxAllowedRetry ? timedOutRemaining : timeRemaining);
+
+      /**
+       * Check if the transition has exceeded its maximum retry limit.
+       * If it has, we treat it as "Expired" and force a synchronous flush.
+       */
+      const isExpired = tryCount > maxAllowedRetry;
+
+      /**
+       * If the task is expired, we pass 'timedOutRemaining' which always returns true.
+       * This ensures the workLoop continues until the entire tree is processed
+       * without yielding to the main thread.
+       */
+      const effectiveTimeRemaining = isExpired ? timedOutRemaining : timeRemaining;
+
+      /**
+       * Execute the callback with the determined priority.
+       * React 19 Lane-like behavior: Expired tasks are processed with Sync priority
+       * to prevent indefinite starvation by other updates.
+       */
+      cb(effectiveTimeRemaining);
     });
 
     return;
