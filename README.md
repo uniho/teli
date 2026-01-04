@@ -21,23 +21,87 @@ Potate supports all the APIs of React including the upcoming concurrent mode API
 
 ## Installation
 
+### Vite
+
+Create your new app with "select a framework: > Vanilla".
+
+``` bash
+npm create vite@latest my-app
+cd my-app
+```
+
+Add `potate` as a dependency.
+```
+npm install potate
+```
+
+Add Potate in your `vite.config.js|.ts` file.
+
+``` js
+import { defineConfig } from 'vite'
+import potate from 'potate/vite'
+
+export default defineConfig({
+  plugins: [potate()],
+})
+
+```
+
+Create `src/main-potate.jsx`.
+
+``` jsx
+import './style.css'
+import javascriptLogo from './javascript.svg'
+import viteLogo from '/vite.svg'
+import Potate from 'potate'
+
+const App = props => {
+  return (
+  <div>
+    <a href="https://vite.dev" target="_blank">
+      <img src={viteLogo} class="logo" alt="Vite logo" />
+    </a>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
+      <img src={javascriptLogo} class="logo vanilla" alt="JavaScript logo" />
+    </a>
+    <h1>Hello Potate on Vite!</h1>
+    <p class="read-the-docs">
+      Click on the Vite logo to learn more
+    </p>
+  </div>
+  )
+}
+
+Potate.render(Potate.createElement(App), document.querySelector('#app'))
+
+```
+
+Edit your `index.html`.
+
+``` html
+  :
+  :
+    <script type="module" src="/src/main-potate.jsx"></script>
+  :
+  :
+```
+
+
+### Esbuild
+
 Add `potate` as a dependency. And `esbuild` as a dev dependency.
 ```
-npm install teli
+npm install potate
 npm install -D esbuild
 ```
 
-Add brahmos in your babel config.
+Build your app.
+
+NOTE: This CLI is build-only. For watch / dev usage, use esbuild's JS API directly.
+
 ```
-{
-  presets: ['@babel/preset-env'],
-  plugins: [
-    //...
-    'brahmos'
-  ]
-}
+npx potate src/entry-point.js --outdir dist
 ```
-**Note:** You will have to remove react preset from babel if you trying brahmos on existing project.
 
 ## Usage
 The API is exact same as React so build how you build application with React, but instead of importing from `react` or `react-dom` import from `brahmos`;
