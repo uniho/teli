@@ -63,12 +63,12 @@ import {createStore, atom} from "jotai"
 
 // Your human rights (specifically your liberty) are fully guaranteed,
 // including the freedom to name this as you wish — such as a 'signal'.
-const createSignal = iniValue => {
+const createSignal = initValue => {
   const _store = createStore()
-  const _atom = atom(iniValue)
+  const _atom = atom(initValue)
   const f = () => _store.get(_atom)
   f.set = newValue => _store.set(_atom, newValue)
-  f.sub = listner => _store.sub(_atom, listner)
+  f.sub = listener => _store.sub(_atom, listener)
   f.atom = _atom
   return f
 }
