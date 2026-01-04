@@ -259,7 +259,7 @@ For the above example, the Brahmos output is 685 bytes, compared to 824 bytes fr
 - [ ] Rewrite core source code with [MoonBit](https://www.moonbitlang.com/)
 
 
-## Out of Scope
+## Won't Do
 
 *The following features are not planned for the core roadmap (though contributors are welcome to explore them):*
 
@@ -267,4 +267,4 @@ For the above example, the Brahmos output is 685 bytes, compared to 824 bytes fr
 * Potate Compiler
 * `useSyncExternalStore` hook
 * `useOptimistic` hook
-* Type definitions/Type safety: We do not prioritize or provide type information unless it directly impacts runtime execution safety.
+* Superficial Type Definitions: We do not provide type information solely to satisfy IDE warnings unless it directly impacts runtime execution safety.
