@@ -1,4 +1,4 @@
-// @flow
+
 import { PREDEFINED_TRANSITION_DEFERRED } from './transitionUtils';
 
 import type { HostFiber } from './flow.types';
