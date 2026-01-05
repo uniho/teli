@@ -1,7 +1,8 @@
+// src/core/hooks.ts
 
 import reRender from './reRender';
 import { getConsumerCallback } from './createContext';
-import { getUniqueId, timestamp } from './utils';
+import { getUniqueId } from './utils';
 
 import {
   UPDATE_TYPE_SYNC,
@@ -11,7 +12,6 @@ import {
   UPDATE_SOURCE_IMMEDIATE_ACTION,
   TRANSITION_STATE_INITIAL,
   TRANSITION_STATE_START,
-  TRANSITION_STATE_TIMED_OUT,
 } from './configs';
 
 import {
@@ -33,14 +33,6 @@ import type {
   ContextType,
   FunctionalComponentUpdate,
 } from './flow.types';
-
-type DeferredValueHookOptions = {
-  timeoutMs: number,
-};
-
-type TransitionOptions = {
-  timeoutMs: number,
-};
 
 type StateHookResult = [any, (state: any) => any];
 
