@@ -37,7 +37,7 @@ import type {
 
 type StateHookResult = [any, (state: any) => any];
 
-type UseTransitionResult = [(cb: Function) => void, boolean];
+type UseTransitionResult = [boolean, (cb: Function) => void];
 
 function getCurrentComponent() {
   return getCurrentComponentFiber().nodeInstance;
