@@ -5,6 +5,10 @@
   "author": "uniho",
   "license": "MIT",
   "type": "module",
+  "keywords": [
+    "react",
+    "potate"
+  ],
   "files": [
     "dist/",
     "bin/",
