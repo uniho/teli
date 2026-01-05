@@ -26,7 +26,7 @@
     }
   },
   "bin": {
-    "potate": "./bin/potate-cli.mjs"
+    "potate": "bin/potate-cli.mjs"
   },
   "scripts": {
     "build": "node ./scripts/build-core.mjs && node ./scripts/build-plugin.mjs",
@@ -34,7 +34,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/uniho/potate"
+    "url": "git+https://github.com/uniho/potate.git"
   },
   "bugs": {
     "url": "https://github.com/uniho/potate/issues"
