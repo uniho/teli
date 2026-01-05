@@ -110,7 +110,7 @@ npx potatejs src/entry-point.js --outdir dist
 
 ## Usage
 
-The API is exact same as React so build how you build application with React, but instead of importing from `react` or `react-dom` import from `potate`;
+The API is exact same as React so build how you build application with React, but instead of importing from `react` or `react-dom` import from `potatejs`;
 
 ```js
 import Potate from 'potatejs'
@@ -137,7 +137,7 @@ root.render(Potate.createElement(App)) // ✖ root.render(<App/>) Please avoid J
 
 ### Using React 3rd party libraries
 
-Just alias react and react-dom with brahmos. And you are good to go using 3rd party react libraries.
+Just alias react and react-dom with potatejs. And you are good to go using 3rd party react libraries.
 
 You need to add following aliases.
 ```js
