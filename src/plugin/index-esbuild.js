@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import { transformCode } from './transformer.js';
 
 export default (options = {}) => ({
-  name: 'potate',
+  name: 'potatejs',
   setup(build) {
     build.onLoad({ filter: /\.(jsx|tsx)$/ }, async (args) => {
       if (args.path.includes('node_modules')) return null;

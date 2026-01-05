@@ -1,6 +1,7 @@
 node_modules
 .cache
-dist
+dist/*
+!dist/type.d.ts
 lib
 *.log
 reference

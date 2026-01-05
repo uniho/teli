@@ -4,7 +4,7 @@ import { transformCode } from './transformer.js';
 
 export default function teli() {
   return {
-    name: 'potate',
+    name: 'potatejs',
     enforce: 'pre',
     transform(code, id) {
       if (!/\.(jsx|tsx)$/.test(id)) return null;

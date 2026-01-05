@@ -13,7 +13,7 @@ export function transformCode(source) {
     sourceType: 'module',
   });
 
-  const LIBRARY_NAME = 'potate';
+  const LIBRARY_NAME = 'potatejs';
   const IMPORT_NAME = 'html';
 
   // 1. Check if 'html' is already imported
