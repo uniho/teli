@@ -61,6 +61,9 @@ const App = props => {
     <a href="https://vite.dev" target="_blank">
       <img src={viteLogo} class="logo" alt="Vite logo" />
     </a>
+    <a href="https://github.com/uniho/potate" target="_blank">
+      <img class="logo" alt="potate" src="https://raw.githubusercontent.com/uniho/potate/main/assets/potate.svg" />
+    </a>
     <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
       <img src={javascriptLogo} class="logo vanilla" alt="JavaScript logo" />
     </a>
