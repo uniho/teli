@@ -257,7 +257,7 @@ For the above example, the Brahmos output is 685 bytes, compared to 824 bytes fr
 - [x] Enhanced `useTransition` hook
 - [x] Enhanced `useDeferredValue` hook
 - [x] `use(resource)` API
-- [x] `watch(resource)` API
+- [x] [`watch(resource)` API](docs/API.md)
 - [x] Provides React 19 style root management.
 - [ ] `use(context)` API
 - [ ] `use(store)` API
