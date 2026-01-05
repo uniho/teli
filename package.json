@@ -1,5 +1,5 @@
 {
-  "name": "potate",
+  "name": "potatejs",
   "version": "0.12.0",
   "description": "Super charged UI library with modern React API and native templates.",
   "author": "uniho",
@@ -26,7 +26,7 @@
     }
   },
   "bin": {
-    "potate": "bin/potate-cli.mjs"
+    "potatejs": "bin/potate-cli.mjs"
   },
   "scripts": {
     "build": "node ./scripts/build-core.mjs && node ./scripts/build-plugin.mjs",

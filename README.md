@@ -30,19 +30,19 @@ npm create vite@latest my-app
 cd my-app
 ```
 
-Add `potate` as a dependency.
+Add `potatejs` as a dependency.
 ```
-npm install potate
+npm install potatejs
 ```
 
 Add Potate in your `vite.config.js|.ts` file.
 
 ``` js
 import { defineConfig } from 'vite'
-import potate from 'potate/vite'
+import potatejs from 'potatejs/vite'
 
 export default defineConfig({
-  plugins: [potate()],
+  plugins: [potatejs()],
 })
 
 ```
@@ -53,7 +53,7 @@ Create `src/main-potate.jsx`.
 import './style.css'
 import javascriptLogo from './javascript.svg'
 import viteLogo from '/vite.svg'
-import Potate from 'potate'
+import Potate from 'potatejs'
 
 const App = props => {
   return (
@@ -90,9 +90,9 @@ Edit your `index.html`.
 
 ### Esbuild
 
-Add `potate` as a dependency. And `esbuild` as a dev dependency.
+Add `potatejs` as a dependency. And `esbuild` as a dev dependency.
 ```
-npm install potate
+npm install potatejs
 npm install -D esbuild
 ```
 
@@ -101,7 +101,7 @@ Build your app.
 NOTE: This CLI is build-only. For watch / dev usage, use esbuild's JS API directly.
 
 ```
-npx potate src/entry-point.js --outdir dist
+npx potatejs src/entry-point.js --outdir dist
 ```
 
 
@@ -110,7 +110,7 @@ npx potate src/entry-point.js --outdir dist
 The API is exact same as React so build how you build application with React, but instead of importing from `react` or `react-dom` import from `potate`;
 
 ```js
-import Potate from 'potate'
+import Potate from 'potatejs'
 
 export default function App(props) {
   const [state, setState] = Potate.useState(0)
@@ -139,9 +139,9 @@ Just alias react and react-dom with brahmos. And you are good to go using 3rd pa
 You need to add following aliases.
 ```js
 alias: {
-  react: 'potate',
-  'react-dom': 'potate',
-  'react/jsx-runtime': 'potate'
+  react: 'potatejs',
+  'react-dom': 'potatejs',
+  'react/jsx-runtime': 'potatejs'
 },
 ```
 
