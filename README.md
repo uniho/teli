@@ -31,7 +31,7 @@ cd my-app
 ```
 
 Add `potatejs` as a dependency.
-```
+``` bash
 npm install potatejs
 ```
 
@@ -94,7 +94,7 @@ Edit your `index.html`.
 ### Esbuild
 
 Add `potatejs` as a dependency. And `esbuild` as a dev dependency.
-```
+``` bash
 npm install potatejs
 npm install -D esbuild
 ```
@@ -103,7 +103,7 @@ Build your app.
 
 NOTE: This CLI is build-only. For watch / dev usage, use esbuild's JS API directly.
 
-```
+``` bash
 npx potatejs src/entry-point.js --outdir dist
 ```
 
