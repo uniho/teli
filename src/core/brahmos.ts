@@ -101,6 +101,7 @@ export {
 export {createRoot} from './root'
 export {use} from './use';
 export {startTransition} from './hooks';
+export {watch, initWatch} from './watch';
 
 /** Export transforms */
 export const jsx = createBrahmosNode;
