@@ -239,6 +239,7 @@ For the above example, the Brahmos output is 685 bytes, compared to 824 bytes fr
 - [x] Vite Plugin to transpile JSX to tagged templates
 - [x] Esbuild Plugin to transpile JSX to tagged templates
 - [x] The Lanes Light
+- [x] The Standalone `startTransition`
 - [x] Enhanced `useTransition` hook
 - [x] Enhanced `useDeferredValue` hook
 - [x] `use(resource)` API
