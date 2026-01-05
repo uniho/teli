@@ -6,7 +6,7 @@
 
 **Po**wered by **Ta**gged **Te**mplate.
 
-> **Note**: This project is a fork of [brahmosjs/brahmos](https://github.com/brahmosjs/brahmos), extending its capabilities with a custom fiber architecture and enhanced concurrent features.
+**Note**: This project is a fork of [brahmosjs/brahmos](https://github.com/brahmosjs/brahmos).
 
 Supercharged JavaScript library to build user interfaces with modern React API and native templates.
 
