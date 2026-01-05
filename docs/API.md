@@ -5,6 +5,10 @@
 
 The `watch(resource)` API connects your component to a shared resource and manages the **Suspense** lifecycle. It can be called inside `if` statements, `for` loops, or after early returns.
 
+By default, watch utilizes Transition Updates. This ensures a stable UI where the Suspense fallback is not displayed; the engine maintains the current screen until the resource is ready.
+
+For interactions requiring zero-latency feedback (e.g., keyboard inputs), use watch.sync to force a Sync Update.
+
 ```javascript
 import { Suspense, watch, initWatch } from 'potate'
 import { myStore } from './my-store'
@@ -18,8 +22,10 @@ export props => {
 }
 
 const Profile = props => {
-  // Suspension & Observation
+  // Default: Transition-based (No fallback shown)
   watch(resource)
+  // Sync Update (For managed inputs)
+  // watch.sync(resource)
 
   // Data Acquisition (Directly from the store)
   const data = myStore.get()
