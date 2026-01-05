@@ -73,7 +73,7 @@ const App = props => {
 }
 
 const root = Potate.createRoot(document.querySelector('#app'))
-root.render(Potate.createElement(App)) // ✖ root.render(<App/>) Avoid JSX at the root
+root.render(Potate.createElement(App)) // ✖ root.render(<App/>) Please avoid JSX at the root
 
 ```
 
@@ -104,14 +104,20 @@ NOTE: This CLI is build-only. For watch / dev usage, use esbuild's JS API direct
 npx potate src/entry-point.js --outdir dist
 ```
 
+
 ## Usage
+
 The API is exact same as React so build how you build application with React, but instead of importing from `react` or `react-dom` import from `potate`;
 
 ```js
-import {useState, useEffect} from 'potate';
+import Potate from 'potate'
 
 export default function App(props) {
-  const [state, setState] = useState(0);
+  const [state, setState] = Potate.useState(0)
+
+  Potate.useEffect(() => {
+      ...
+  }, [])
 
   return (
     <div>
@@ -119,6 +125,10 @@ export default function App(props) {
     </div>
   )
 }
+
+const root = Potate.createRoot(document.querySelector('#app'))
+root.render(Potate.createElement(App)) // ✖ root.render(<App/>) Please avoid JSX at the root
+
 ```
 
 
