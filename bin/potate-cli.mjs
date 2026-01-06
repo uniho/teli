@@ -54,6 +54,11 @@ try {
     jsx: 'preserve',
     sourcemap: sourcemap,
     minify: minify,
+    alias: {
+      'react': 'potatejs',
+      'react-dom': 'potatejs',
+      'react/jsx-runtime': 'potatejs',
+    },
   });
 
   console.log('✅ Build complete!');
