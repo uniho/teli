@@ -285,6 +285,7 @@ For the above example, the Brahmos output is 685 bytes, compared to 824 bytes fr
 - [x] `use(resource)` API
 - [x] [watch(resource) API](docs/API.md)
 - [x] React 19 style root management
+- [x] Allow using class instead of className
 - [ ] `use(context)` API
 - [ ] [use(store) API](https://react.dev/blog/2025/04/23/react-labs-view-transitions-activity-and-more#concurrent-stores)
 - [ ] [ref as a prop](https://react.dev/blog/2024/12/05/react-19#ref-as-a-prop)
