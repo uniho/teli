@@ -283,15 +283,15 @@ For the above example, the Brahmos output is 685 bytes, compared to 824 bytes fr
 - [x] Enhanced `useTransition` hook
 - [x] Enhanced `useDeferredValue` hook
 - [x] `use(resource)` API
-- [x] [`watch(resource)` API](docs/API.md)
-- [x] Provides React 19 style root management.
+- [x] [watch(resource) API](docs/API.md)
+- [x] React 19 style root management
 - [ ] `use(context)` API
-- [ ] `use(store)` API
-- [ ] Support for `ref` as a prop
-- [ ] Cleanup functions for refs
-- [ ] `<Context>` as a provider
-- [ ] `startTransition(action)` for POST request.
-- [ ] `useEffectEvent` hook
+- [ ] [use(store) API](https://react.dev/blog/2025/04/23/react-labs-view-transitions-activity-and-more#concurrent-stores)
+- [ ] [ref as a prop](https://react.dev/blog/2024/12/05/react-19#ref-as-a-prop)
+- [ ] [Cleanup functions for refs](https://react.dev/blog/2024/12/05/react-19#cleanup-functions-for-refs)
+- [ ] [<Context> as a provider](https://react.dev/blog/2024/12/05/react-19#context-as-a-provider)
+- [ ] [startTransition(action) for POST request](https://react.dev/blog/2024/12/05/react-19#actions)
+- [ ] [useEffectEvent hook](https://react.dev/reference/react/useEffectEvent)
 - [ ] `useImperativeHandle` hook
 - [ ] `useInsertionEffect` hook
 - [ ] Clean up
