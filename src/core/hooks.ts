@@ -536,13 +536,11 @@ export function useDeferredValue(value: any, initialValue?: any): any {
     initialValue !== undefined ? initialValue : value
   );
 
-  const [, startTransition] = useTransition();
-
   useEffect(() => {
     startTransition(() => {
       setDeferredValue(value);
     });
-  }, [value, startTransition]);
+  }, [value]);
 
   return deferredValue;
 }
