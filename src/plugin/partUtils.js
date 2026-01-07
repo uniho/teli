@@ -1,14 +1,32 @@
+// src/plugin/partUtils.js
 import { t } from './babel-compat.js';
-import { cleanStringForHtml } from './utils.js';
+import { cleanStringForHtml, isHTMLElement } from './utils.js';
 
+/**
+ * We want to reduce the total bytes we send down the wire.
+ * So convert undefined or -1 index to empty string
+ */
 function getSlimIndex(index) {
   return index === undefined || index === -1 ? '' : index;
 }
 
+// check if a node is valid element for templates static part
 function isValidTemplateElement(node) {
-  return t.isJSXText(node) || node.elementCounter !== undefined;
+  return t.isJSXText(node) || (node && node.elementCounter !== undefined);
 }
 
+/**
+ * Function to ignore fragment wrapping.
+ */
+function getEffectiveNodePath(path) {
+  let currentPath = path;
+  while (currentPath.parentPath && t.isJSXFragment(currentPath.parentPath.node)) {
+    currentPath = currentPath.parentPath;
+  }
+  return currentPath;
+}
+
+// function to get the effective children ignoring all the fragments
 export function flattenFragmentChildren(parent) {
   if (!parent || !parent.children) return [];
   const children = [];
@@ -24,6 +42,9 @@ export function flattenFragmentChildren(parent) {
   return children;
 }
 
+/**
+ * Convert parts meta to part code which can be consumed at runtime.
+ */
 export function getPartMetaStringLiteral(partsMeta) {
   const partsMetaWithShortKeys = partsMeta.map((part) => {
     const { isAttribute } = part;
@@ -41,49 +62,54 @@ export function getPartMetaStringLiteral(partsMeta) {
     return `${combinedBooleanCode}|${primaryIndex}|${secondaryIndex}`;
   });
   
-  return partsMetaWithShortKeys.join(',');
+  // Potate's babel-compat returns a Literal for stringLiteral
+  return t.stringLiteral(partsMetaWithShortKeys.join(','));
 }
 
+// function to get the parent above the fragment wrap
 export function getNonFragmentParent(path) {
-  let currentPath = path;
-  while (currentPath && currentPath.parentPath) {
-    const parentNode = currentPath.parentPath.node;
-    if (!t.isJSXFragment(parentNode)) {
-      return parentNode;
-    }
-    currentPath = currentPath.parentPath;
-  }
-  return null;
+  const effectivePath = getEffectiveNodePath(path);
+  const parentNode = effectivePath.parentPath ? effectivePath.parentPath.node : null;
+
+  if (parentNode && !isValidTemplateElement(parentNode)) return parentNode;
+  return parentNode;
 }
 
+// get the previous sibling index wrt to native elements
 export function getPreviousSiblingIndex(path) {
   const { node } = path;
   const parent = getNonFragmentParent(path);
-  if (!parent) return { prevChildIndex: -1, hasExpressionSibling: false };
+  if (!parent) return {};
 
   const children = flattenFragmentChildren(parent);
-  
-  const nodeIndex = children.indexOf(node);
-  if (nodeIndex === -1) return { prevChildIndex: -1, hasExpressionSibling: false };
+  if (!children.length) return {};
 
   const validChildren = children.filter((child) => {
     if (t.isJSXText(child)) {
       return !!cleanStringForHtml(child.value);
-    } else if (child.type === 'JSXExpressionContainer' && t.isJSXEmptyExpression(child.expression)) {
+    } else if (t.isJSXExpressionContainer(child) && t.isJSXEmptyExpression(child.expression)) {
       return false;
     }
     return true;
   });
 
-  const validNodeIndex = validChildren.indexOf(node);
-  const prevSibling = validChildren[validNodeIndex - 1];
+  const nodeIndex = validChildren.indexOf(node);
+  if (nodeIndex === -1) return {};
 
+  const prevSibling = validChildren[nodeIndex - 1];
+
+  /**
+   * check if prev sibling is expression node.
+   * If it is a expression node we will be adding an empty text node between
+   */
   const hasExpressionSibling = !!prevSibling && !isValidTemplateElement(prevSibling);
 
   let prevChildIndex = -1;
-  for (let i = 0; i <= validNodeIndex; i++) {
-    const child = validChildren[i];
-    if (isValidTemplateElement(child) || (i > 0 && !isValidTemplateElement(validChildren[i - 1]))) {
+  for (let i = 0; i <= nodeIndex; i++) {
+    if (
+      isValidTemplateElement(validChildren[i]) ||
+      (i > 0 && !isValidTemplateElement(validChildren[i - 1]))
+    ) {
       prevChildIndex += 1;
     }
   }
@@ -94,18 +120,45 @@ export function getPreviousSiblingIndex(path) {
   };
 }
 
+/**
+ * check if the node is native html element (static element)
+ */
+function isHTMLNode(node) {
+  if (!t.isJSXElement(node)) return false;
+  const nameNode = node.openingElement.name;
+  const tagName = nameNode.name;
+  return isHTMLElement(tagName) && tagName !== 'svg';
+}
+
+function isRenderableText(node) {
+  return t.isJSXText(node) && !!cleanStringForHtml(node.value);
+}
+
+/**
+ * check if expression nodes are wrapped around text node.
+ * Uses the while loop from blueprint to handle consecutive expressions.
+ */
 export function isWrappedWithString(path) {
+  const effectivePath = getEffectiveNodePath(path);
   const parent = getNonFragmentParent(path);
   if (!parent) return false;
 
   const children = flattenFragmentChildren(parent);
-  const nodeIndex = children.indexOf(path.node);
-  if (nodeIndex <= 0 || nodeIndex >= children.length - 1) return false;
-
+  let nodeIndex = children.indexOf(effectivePath.node);
   const prevNode = children[nodeIndex - 1];
-  const nextNode = children[nodeIndex + 1];
 
-  const isRenderableText = (n) => t.isJSXText(n) && !!cleanStringForHtml(n.value);
+  if (!(prevNode && isRenderableText(prevNode))) return false;
 
-  return isRenderableText(prevNode) && isRenderableText(nextNode);
+  let nextNode;
+  while ((nextNode = children[nodeIndex + 1])) {
+    if (isRenderableText(nextNode)) {
+      return true;
+    } else if (t.isJSXExpressionContainer(nextNode) || !isHTMLNode(nextNode)) {
+      nodeIndex += 1;
+    } else {
+      return false;
+    }
+  }
+
+  return false;
 }

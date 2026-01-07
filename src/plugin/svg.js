@@ -6,25 +6,45 @@ import { isHTMLElement } from './utils.js';
 export function isSvgHasDynamicPart(part) {
   let hasDynamicPart = false;
 
-  const setDynamicPart = (path) => {
-    hasDynamicPart = true;
-    path.stop();
-  };
+  function walk(node) {
+    if (hasDynamicPart) return;
+    if (!node || typeof node !== 'object') return;
 
-  const jsxElementVisitor = (path) => {
-    const { openingElement } = path.node;
-    const tagName = openingElement.name.name;
-
-    if (!isHTMLElement(tagName)) {
-      setDynamicPart(path);
+    if (node.type === 'JSXSpreadAttribute') {
+      hasDynamicPart = true;
+      return;
     }
-  };
 
-  part.traverse({
-    JSXSpreadAttribute: setDynamicPart,
-    JSXExpressionContainer: setDynamicPart,
-    JSXElement: jsxElementVisitor,
-  });
+    if (node.type === 'JSXExpressionContainer') {
+      hasDynamicPart = true;
+      return;
+    }
+
+    if (node.type === 'JSXElement') {
+      const nameNode = node.openingElement.name;
+      if (nameNode.type === 'JSXMemberExpression') {
+        hasDynamicPart = true;
+        return;
+      }
+      const tagName = nameNode.name;
+      if (!isHTMLElement(tagName)) {
+        hasDynamicPart = true;
+        return;
+      }
+    }
+
+    for (const key in node) {
+      if (key === 'parent' || key === 'parentPath' || key === 'loc') continue;
+      const val = node[key];
+      if (Array.isArray(val)) {
+        val.forEach(walk);
+      } else if (val && typeof val === 'object') {
+        walk(val);
+      }
+    }
+  }
+
+  walk(part.node);
 
   return hasDynamicPart;
 }

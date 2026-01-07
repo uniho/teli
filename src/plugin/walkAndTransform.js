@@ -1,6 +1,8 @@
 // plugin/walkAndTransform.js
 
 import getTaggedTemplate from './taggedTemplate.js';
+import { addBrahmosRuntime, transformToAstNode } from './utils.js';
+import { createPath } from './babel-compat.js';
 
 /**
  * Recursively walk through the AST and transform JSX nodes 
@@ -8,13 +10,18 @@ import getTaggedTemplate from './taggedTemplate.js';
 export default function walkAndTransform(node) {
   if (!node || typeof node !== 'object') return node;
 
+  if (node.type === 'Program') {
+    addBrahmosRuntime(createPath(node));
+  }
+
   if (Array.isArray(node)) {
     return node.map(walkAndTransform);
   }
 
   if (node.type === 'JSXElement' || node.type === 'JSXFragment') {
     const result = getTaggedTemplate(node);
-    return transformToAstNode(result);
+    const astNode = transformToAstNode(result);
+    return walkAndTransform(astNode);
   }
 
   const newNode = { ...node };
@@ -24,41 +31,4 @@ export default function walkAndTransform(node) {
     }
   }
   return newNode;
-}
-
-/**
- * Maps the result of getTaggedTemplate into a valid AST node.
- * Note: Ensured that 'astring' correctly recognizes TemplateElement content
- * by guaranteeing value: { raw, cooked } structure and building (html`...`)("meta") format.
- */
-function transformToAstNode(res) {
-  if (typeof res === 'string') {
-    return { type: 'Literal', value: res, raw: `'${res}'` };
-  }
-  
-  if (res.type === 'TaggedTemplateExpression') {
-    return {
-      type: 'CallExpression',
-      callee: {
-        type: 'TaggedTemplateExpression',
-        // tag name uses 'html' etc. passed from getTaggedTemplate
-        tag: { type: 'Identifier', name: res.tag },
-        quasi: {
-          type: 'TemplateLiteral',
-          quasis: res.template.strings.map(s => ({
-            type: 'TemplateElement',
-            // astring requires value: { raw, cooked } to output the content
-            value: {
-              raw: s.value.raw || '',
-              cooked: s.value.cooked || ''
-            },
-            tail: s.tail
-          })),
-          expressions: res.template.expressions
-        }
-      },
-      arguments: [{ type: 'Literal', value: res.meta, raw: `'${res.meta}'` }]
-    };
-  }
-  return res;
 }

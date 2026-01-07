@@ -6,6 +6,7 @@ lib
 *.log
 reference
 .DS_Store
+src/*/.*
 
 # editor specific files
 .vscode
