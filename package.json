@@ -18,7 +18,9 @@
   "exports": {
     ".": {
       "types": "./dist/type.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./vite": {
       "types": "./dist/type.d.ts",
@@ -27,6 +29,11 @@
     "./esbuild": {
       "types": "./dist/type.d.ts",
       "import": "./dist/index-esbuild.js"
+    },
+    "./jsx-runtime": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
   "bin": {

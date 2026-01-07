@@ -158,7 +158,7 @@ export default defineConfig({
 ```
 
 ```json
-// tsconfig.json
+// tsconfig.json - Probably not required, but add it if necessary.
 {
   "compilerOptions": {
 
