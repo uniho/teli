@@ -173,6 +173,35 @@ export default defineConfig({
 
 ```
 
+#### TEST
+
+```bash
+npm install react-select
+npm install react-confetti
+```
+
+```jsx
+import Potate from 'potatejs'
+import Confetti from 'react-confetti';
+import Select from 'react-select'
+
+const options = [
+  { value: 'chocolate', label: 'Chocolate' },
+  { value: 'strawberry', label: 'Strawberry' },
+  { value: 'vanilla', label: 'Vanilla' }
+]
+
+const App = (props) => {
+  return (<div>
+    <Confetti width={1000} height={1000} />
+    <Select options={options} />
+  </div>)
+}
+
+const root = Potate.createRoot(document.querySelector('#app'))
+root.render(<App/>)
+
+```
 
 ## Idea
 
