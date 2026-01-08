@@ -326,6 +326,7 @@ For the above example, the Brahmos output is 685 bytes, compared to 824 bytes fr
 - [ ] ⭐ [useEffectEvent hook](https://react.dev/reference/react/useEffectEvent)
 - [ ] ⭐ `useImperativeHandle` hook
 - [ ] ⭐ `useInsertionEffect` hook
+- [ ] Handle server rendering(SSR, renderToString)
 - [ ] Clean up
 - [ ] Performance improvement
 - [ ] Bug fixes
