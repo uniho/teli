@@ -10,7 +10,7 @@ import { startTransition } from './hooks';
  * The Constructor: Purely functional resource creation with smart cleanup.
  * Executes the listener registration immediately outside of the render cycle.
  */
-export function initWatch(sub) {
+function createWatch(sub) {
   const promise = Promise.resolve(); // create an immediately fulfilled Promise.
   const listeners = new Set(); // A Set used as a listener registry.
   
@@ -55,6 +55,8 @@ export function initWatch(sub) {
 export function watch(usable) {
   watchBase(usable);
 }
+
+watch.create = createWatch;
 
 watch.sync = (usable) => {
   watchBase(usable, { sync: true });

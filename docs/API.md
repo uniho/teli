@@ -10,7 +10,7 @@ By default, watch utilizes Transition Updates. This ensures a stable UI where th
 For interactions requiring zero-latency feedback (e.g., keyboard inputs), use watch.sync to force a Sync Update.
 
 ```javascript
-import { Suspense, watch, initWatch } from 'potatejs'
+import { Suspense, watch } from 'potatejs'
 import { myStore } from './my-store'
 
 export props => {
@@ -34,9 +34,9 @@ const Profile = props => {
 }
 
 //
-const resource = initWatch((set) => {
+const resource = watch.create(listener => {
   // side effects like subscribing to a store or fetching data
-  const unsubscribe = myStore.subscribe(set)
+  const unsubscribe = myStore.subscribe(listener)
   return unsubscribe
 })
 
@@ -61,7 +61,7 @@ The following rules must be observed:
 ## Jotai Example
 
 ``` js
-import { Suspense, watch, initWatch } from 'potatejs'
+import { Suspense, watch } from 'potatejs'
 import {createStore, atom} from "jotai"
 
 // Your human rights (specifically your liberty) are fully guaranteed,
@@ -88,7 +88,7 @@ const Profile = props => {
   return (<div>Name: {data.name}</div>)
 }
 
-const resource = initWatch(listener => {
+const resource = watch.create(listener => {
   const unsubscribe = mySignal.sub(listener)
   return unsubscribe
 })
