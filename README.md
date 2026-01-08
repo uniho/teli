@@ -319,10 +319,10 @@ For the above example, the Brahmos output is 685 bytes, compared to 824 bytes fr
 - [x] Allow using class instead of className
 - [x] ⭐ [`<Context>` as a provider](https://react.dev/blog/2024/12/05/react-19#context-as-a-provider)
 - [x] ⭐ [ref as a prop](https://react.dev/blog/2024/12/05/react-19#ref-as-a-prop)
+- [x] ⭐ [startTransition(action) for POST request](https://react.dev/blog/2024/12/05/react-19#actions)
 - [ ] ⭐ `use(context)` API
 - [ ] ⭐ [use(store) API](https://react.dev/blog/2025/04/23/react-labs-view-transitions-activity-and-more#concurrent-stores)
 - [ ] ⭐ [Cleanup functions for refs](https://react.dev/blog/2024/12/05/react-19#cleanup-functions-for-refs)
-- [ ] ⭐ [startTransition(action) for POST request](https://react.dev/blog/2024/12/05/react-19#actions)
 - [ ] ⭐ [useEffectEvent hook](https://react.dev/reference/react/useEffectEvent)
 - [ ] ⭐ `useImperativeHandle` hook
 - [ ] ⭐ `useInsertionEffect` hook

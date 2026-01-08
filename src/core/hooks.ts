@@ -3,6 +3,7 @@
 import reRender from './reRender';
 import { getConsumerCallback } from './createContext';
 import { getUniqueId } from './utils';
+import { doDeferredProcessing } from './workLoop';
 
 import {
   UPDATE_TYPE_SYNC,
@@ -453,7 +454,17 @@ export function startTransition(callback: Function) {
    * Execute the callback within the global transition context.
    * This allows state updates (like setState) within the scope to inherit this transitionId.
    */
-  withTransition(transitionConfig, callback);
+  let result;
+  withTransition(transitionConfig, () => {
+    result = callback();
+  });
+
+  // Handle async errors for standalone startTransition
+  if (result && typeof result.then === 'function') {
+    result.then(null, (error) => {
+      console.error('Uncaught error in transition:', error);
+    });
+  }
 }
 
 /**
@@ -473,6 +484,8 @@ export function useTransition(): UseTransitionResult {
         tryCount: 0,
         isPending: false,
         transitionTimeout: null,
+        isRunningAsyncAction: false,
+        asyncActionCount: 0,
         pendingSuspense: [],
         transitionState: TRANSITION_STATE_INITIAL,
         clearTimeout() {
@@ -501,6 +514,7 @@ export function useTransition(): UseTransitionResult {
           // reset the transitionState and pending suspense
           hook.transitionState = TRANSITION_STATE_START;
           hook.pendingSuspense = [];
+          hook.isRunningAsyncAction = false;
 
           // clear pending timeout
           hook.clearTimeout();
@@ -520,7 +534,8 @@ export function useTransition(): UseTransitionResult {
           if (result && typeof result.then === 'function') {
             hook.asyncActionCount = (hook.asyncActionCount || 0) + 1;
             hook.isRunningAsyncAction = true;
-            hook.updatePendingState(true, initialUpdateSource);
+            hook.updatePendingState(true, UPDATE_SOURCE_TRANSITION);
+            doDeferredProcessing(root);
             result.then(
               () => {
                 hook.asyncActionCount--;
