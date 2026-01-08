@@ -13,7 +13,7 @@ import {
   isEmptyLiteralWrap,
   createAttributeExpression,
   transformToAstNode,
-  getAttributeName,
+  createAttributeProperty,
 } from './utils.js';
 import {
   getPartMetaStringLiteral,
@@ -26,18 +26,18 @@ import { isSvgHasDynamicPart } from './svg.js';
 /**
  * Physical conversion of JSX name nodes to JS nodes.
  */
-function jsxNameToExpression(node) {
-  if (node.type === 'JSXIdentifier') {
-    return { type: 'Identifier', name: node.name };
-  } else if (node.type === 'JSXMemberExpression') {
-    return {
-      type: 'MemberExpression',
-      object: jsxNameToExpression(node.object),
-      property: jsxNameToExpression(node.property),
-      computed: false
-    };
+function jsxToObject(node) {
+  if (t.isJSXIdentifier(node)) {
+    return t.identifier(node.name);
+  } else if (t.isJSXMemberExpression(node)) {
+    /**
+     * recursively change object property of JSXMemberExpression
+     * to MemberExpression
+     */
+    const objectNode = jsxToObject(node.object);
+    const property = jsxToObject(node.property);
+    return t.memberExpression(objectNode, property);
   }
-  throw new Error(`Unsupported JSX name type: ${node.type}`);
 }
 
 /**
@@ -143,12 +143,11 @@ function getLiteralParts(rootPath) {
             lastExpression = pushAttributeToExpressions(attr.argument, lastExpression, createPath(attr, path));
           } else {
             const { name, value } = attr;
-            const attrNameStr = getAttributeName(name);
-            if (needsToBeExpression(tagName, attrNameStr) || (value && value.type === 'JSXExpressionContainer')) {
+            if (needsToBeExpression(tagName, name.name) || (value && value.type === 'JSXExpressionContainer')) {
               const expr = createAttributeExpression(name, value);
               lastExpression = pushAttributeToExpressions(expr, lastExpression, createPath(attr, path));
             } else {
-              const attrName = PROPERTY_ATTRIBUTE_MAP[attrNameStr] || attrNameStr;
+              const attrName = PROPERTY_ATTRIBUTE_MAP[name.name] || name.name;
               let attrString = ` ${attrName}`;
               if (value) {
                 const attrValue = value.value;
@@ -166,43 +165,48 @@ function getLiteralParts(rootPath) {
         path.get('children').forEach(recursePath);
         if (!SELF_CLOSING_TAGS.includes(tagName)) stringPart.push(`</${tagName}>`);
       } else {
+        const componentName = isHTMLElement(nameNode.name)
+          ? t.stringLiteral(nameNode.name)
+          : jsxToObject(nameNode);
+
+        // add props
         const propsProperties = [];
         let keyValue = null;
 
         openingElement.attributes.forEach((attr) => {
           if (attr.type === 'JSXAttribute') {
-            const attrName = attr.name.name;
-            const valNode = getAttrValue(attr.value);
-            if (attrName === 'key') {
-              keyValue = valNode;
+            if (attr.name.name === 'key') {
+              keyValue = getAttrValue(attr.value);
             } else {
-              propsProperties.push({ type: 'Property', key: { type: 'Identifier', name: attrName }, value: valNode, kind: 'init' });
+              propsProperties.push(createAttributeProperty(attr.name, attr.value));
             }
           } else if (attr.type === 'JSXSpreadAttribute') {
-            propsProperties.push({ type: 'SpreadElement', argument: attr.argument });
+            propsProperties.push(t.spreadElement(attr.argument));
           }
         });
 
+        const jsxArguments = [componentName, t.objectExpression(propsProperties)];
+
+        // if the node has children add it in props
         const childrenPaths = path.get('children');
-        
         if (childrenPaths && childrenPaths.length) {
-          propsProperties.push({
-            type: 'Property',
-            key: { type: 'Identifier', name: 'children' },
-            value: transformToAstNode(getTaggedTemplate(childrenPaths)),
-            kind: 'init'
-          });
+          propsProperties.push(
+            createAttributeProperty(
+              t.identifier('children'),
+              transformToAstNode(getTaggedTemplate(childrenPaths))
+            )
+          );
         }
 
-        pushToExpressions({
-          type: 'CallExpression',
-          callee: {
-            type: 'Identifier', name: '_brahmosJSX'
-          },
-          arguments: keyValue 
-            ? [jsxNameToExpression(nameNode), { type: 'ObjectExpression', properties: propsProperties }, keyValue]
-            : [jsxNameToExpression(nameNode), { type: 'ObjectExpression', properties: propsProperties }]
-        }, path, false);
+        // add key if present on arguments
+        if (keyValue) {
+          jsxArguments.push(keyValue);
+        }
+
+        const brahmosJSXFunction = t.identifier('_brahmosJSX');
+        const expression = t.callExpression(brahmosJSXFunction, jsxArguments);
+
+        pushToExpressions(expression, path, false);
       }
     } else if (node.type === 'JSXFragment') {
       // Explicitly handle Fragment children

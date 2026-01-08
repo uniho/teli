@@ -61,20 +61,11 @@ export function getPropValue(value) {
   return t.isJSXExpressionContainer(value) ? value.expression : value;
 }
 
-/**
- * Get the attribute name from a JSXAttribute name node
- */
-export function getAttributeName(nameNode) {
-  if (nameNode.type === 'JSXNamespacedName') {
-    return `${nameNode.namespace.name}:${nameNode.name.name}`;
-  }
-  return nameNode.name;
-}
-
 export function createAttributeProperty(name, value) {
   value = value || t.booleanLiteral(true); // if value is not present it means the prop is of boolean type with true value
 
-  const attrNameStr = getAttributeName(name);
+  const attrNameStr = name.name;
+
   const propName = attrNameStr.match('-|:')
     ? t.stringLiteral(attrNameStr)
     : t.identifier(attrNameStr);

@@ -84,6 +84,8 @@ export const t = {
   isJSXEmptyExpression(node) { return node && node.type === 'JSXEmptyExpression'; },
   isJSXAttribute(node) { return node && node.type === 'JSXAttribute'; },
   isJSXSpreadAttribute(node) { return node && node.type === 'JSXSpreadAttribute'; },
+  isJSXIdentifier(node) { return node && node.type === 'JSXIdentifier'; },
+  isJSXMemberExpression(node) { return node && node.type === 'JSXMemberExpression'; },
 };
 
 export function createPath(node, parentPath = null) {
