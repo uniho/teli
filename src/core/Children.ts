@@ -1,4 +1,5 @@
-// @flow
+// core/Children.ts
+
 import { BRAHMOS_DATA_KEY } from './configs';
 import { isTagElementNode, isComponentNode, isTagNode, isHtmlTagNode } from './brahmosNode';
 import { getNormalizedProps, isNil, toArray } from './utils';
@@ -127,10 +128,15 @@ export function cloneElement(node: any, props: ObjectLiteral): BrahmosNode | nul
       const parsedChildren = parseChildren(node);
       return cloneElement(parsedChildren, props);
     } else if (isComponentNode(node) || isTagElementNode(node)) {
+      const element = node.type;
+      const _isClassComponent = typeof element === 'function' && element.prototype && element.prototype.isReactComponent;
+      // React 19: Allow ref as prop for functional components
+      const includeRef = (typeof element === 'function' && !_isClassComponent) || element.__isForwardRef;
+
       return {
         ...node,
-        props: { ...node.props, ...getNormalizedProps(props, false) },
-        ref: props.ref,
+        props: { ...node.props, ...getNormalizedProps(props, includeRef) },
+        ref: includeRef ? null : props.ref,
       };
     }
   }

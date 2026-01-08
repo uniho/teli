@@ -1,4 +1,5 @@
-// @flow
+// core/createElement.ts
+
 import { getNormalizedProps, toArray } from './utils';
 import {
   brahmosNode,
@@ -17,9 +18,14 @@ export function createBrahmosNode(element: string | Function, props: Configs, ke
   // There can be chances key might be in props, if key is not passed as arg try to find it in props
   if (key === undefined) key = props.key;
 
+  // Check if it is a class component
+  const _isClassComponent = typeof element === 'function' && element.prototype && element.prototype.isReactComponent;
+
   // remove key and ref property from props if present
+  // React 19: Allow ref as prop for functional components
   // $FlowFixMe: It's okay to access __isForwardRef always.
-  props = getNormalizedProps(props, element.__isForwardRef);
+  const includeRef = (typeof element === 'function' && !_isClassComponent) || element.__isForwardRef;
+  props = getNormalizedProps(props, includeRef);
 
   const node = brahmosNode(props, null, key);
   node.type = element;
@@ -36,8 +42,6 @@ export function createBrahmosNode(element: string | Function, props: Configs, ke
   }
 
   // otherwise if its a component handle the component node
-  const _isClassComponent = element.prototype && element.prototype.isReactComponent;
-
   node.nodeType = _isClassComponent ? CLASS_COMPONENT_NODE : FUNCTIONAL_COMPONENT_NODE;
 
   // Add ref for class component
