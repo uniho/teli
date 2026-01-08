@@ -276,30 +276,30 @@ For the above example, the Brahmos output is 685 bytes, compared to 824 bytes fr
 - [x] Concurrent Mode
 - [x] 3rd Party React library support (Tested React-router, redux, mobx, react-query, zustand, recharts)
 - [x] React Utilities and Methods
-- [x] Vite Plugin to transpile JSX to tagged templates
-- [x] Esbuild Plugin to transpile JSX to tagged templates
-- [x] The Lanes Light **(Though I haven't cleaned up the no-longer-needed TRANSITION_STATE_TIMED_OUT yet.)**
-- [x] The Standalone `startTransition`
-- [x] Enhanced `useTransition` hook
-- [x] Enhanced `useDeferredValue` hook
-- [x] `use(resource)` API
-- [x] [watch(resource) API](docs/API.md)
-- [x] React 19 style root management
+- [x] ⭐⭐⭐ Vite Plugin to transpile JSX to tagged templates
+- [x] ⭐⭐⭐ Esbuild Plugin to transpile JSX to tagged templates
+- [x] ⭐ The Lanes Light **(Though I haven't cleaned up the no-longer-needed TRANSITION_STATE_TIMED_OUT yet.)**
+- [x] ⭐ The Standalone `startTransition`
+- [x] ⭐ Enhanced `useTransition` hook
+- [x] ⭐ Enhanced `useDeferredValue` hook
+- [x] ⭐ `use(resource)` API
+- [x] ⭐⭐⭐ [watch(resource) API](docs/API.md)
+- [x] ⭐ React 19 style root management
 - [x] Allow using class instead of className
-- [ ] `use(context)` API
-- [ ] [use(store) API](https://react.dev/blog/2025/04/23/react-labs-view-transitions-activity-and-more#concurrent-stores)
-- [ ] [ref as a prop](https://react.dev/blog/2024/12/05/react-19#ref-as-a-prop)
-- [ ] [Cleanup functions for refs](https://react.dev/blog/2024/12/05/react-19#cleanup-functions-for-refs)
-- [ ] [`<Context>` as a provider](https://react.dev/blog/2024/12/05/react-19#context-as-a-provider)
-- [ ] [startTransition(action) for POST request](https://react.dev/blog/2024/12/05/react-19#actions)
-- [ ] [useEffectEvent hook](https://react.dev/reference/react/useEffectEvent)
-- [ ] `useImperativeHandle` hook
-- [ ] `useInsertionEffect` hook
+- [ ] ⭐ `use(context)` API
+- [ ] ⭐ [use(store) API](https://react.dev/blog/2025/04/23/react-labs-view-transitions-activity-and-more#concurrent-stores)
+- [ ] ⭐ [ref as a prop](https://react.dev/blog/2024/12/05/react-19#ref-as-a-prop)
+- [ ] ⭐ [Cleanup functions for refs](https://react.dev/blog/2024/12/05/react-19#cleanup-functions-for-refs)
+- [ ] ⭐ [`<Context>` as a provider](https://react.dev/blog/2024/12/05/react-19#context-as-a-provider)
+- [ ] ⭐ [startTransition(action) for POST request](https://react.dev/blog/2024/12/05/react-19#actions)
+- [ ] ⭐ [useEffectEvent hook](https://react.dev/reference/react/useEffectEvent)
+- [ ] ⭐ `useImperativeHandle` hook
+- [ ] ⭐ `useInsertionEffect` hook
 - [ ] Clean up
 - [ ] Performance improvement
 - [ ] Bug fixes
 - [ ] Test Cases
-- [ ] Rewrite core source code with [MoonBit](https://www.moonbitlang.com/)
+- [ ] ⭐ Rewrite core source code with [MoonBit](https://www.moonbitlang.com/)
 
 
 ## Won't Do
