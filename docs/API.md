@@ -53,7 +53,7 @@ The following rules must be observed:
 
 * ​Pure Getters: `store.get()` must be a pure function. It is strictly prohibited to execute I/O operations or state updates inside `get()` to ensure idempotency.
 
-* ​Side Effects in initWatch: Feel free to perform side effects (such as subscribing to stores or initiating data fetches) inside the function passed to initWatch. Because this function is executed before the component renders, it is perfectly safe and designed to handle these operations.
+* ​Side Effects in initializer: Feel free to perform side effects (such as subscribing to stores or initiating data fetches) inside the function passed to `watch.create()`. Because this function is executed before the component renders, it is perfectly safe and designed to handle these operations.
 
 * ​Store's Responsibility & Re-render Guarantee: It is the store's responsibility to notify the engine via the listener whenever its data changes. It is perfectly safe for side effects to occur when the listener is triggered, as the engine guarantees a subsequent re-render to synchronize the UI.
 
