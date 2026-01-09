@@ -182,12 +182,14 @@ export default defineConfig({
 ```bash
 npm install react-select
 npm install react-confetti
+npm install react-simple-typewriter
 ```
 
 ```jsx
 import Potate from 'potatejs'
 import _Confetti from 'react-confetti';
 import _Select from 'react-select'
+import {Typewriter as _Typewriter} from 'react-simple-typewriter';
 
 const options = [
   { value: 'chocolate', label: 'Chocolate' },
@@ -197,11 +199,17 @@ const options = [
 
 const Confetti = Potate.reacty(_Confetti)
 const Select = Potate.reacty(_Select)
+const Typewriter = Potate.reacty(_Typewriter);
 
 const App = (props) => {
   return (<div>
     <Confetti width={1000} height={1000} />
     <Select options={options} />
+    <Typewriter
+      words={['Hello Potate', 'I am for React', 'It works!']}
+      loop={5}
+      cursor
+    />
   </div>)
 }
 
