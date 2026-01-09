@@ -1,6 +1,88 @@
 
 # Potate API Documentation
 
+## `reacty(ReactComponet)`
+
+Declares that a component created for React will be used within Potate. When a component is marked as a React Component, its children are also treated as React components.
+
+### Setup Aliases
+
+You need to add following aliases.
+
+```js
+// vite.config.ts
+export default defineConfig({
+
+  resolve: {
+    alias: {
+      'react': 'potatejs',
+      'react-dom': 'potatejs',
+      'react/jsx-runtime': 'potatejs',
+    },
+  },
+
+});
+
+```
+
+```json
+// tsconfig.json - Probably not required, but add it if necessary.
+{
+  "compilerOptions": {
+
+    "paths": {
+      "react": ["./node_modules/potatejs"],
+      "react-dom": ["./node_modules/potatejs"],
+      "react/jsx-runtime": ["./node_modules/potatejs"],
+    },
+
+  }
+}
+
+```
+
+### Use it
+
+```bash
+npm install react-select
+npm install react-confetti
+npm install react-simple-typewriter
+```
+
+```jsx
+import Potate from 'potatejs'
+import Confetti from 'react-confetti';
+import Select from 'react-select'
+import {Typewriter} from 'react-simple-typewriter';
+
+const options = [
+  { value: 'chocolate', label: 'Chocolate' },
+  { value: 'strawberry', label: 'Strawberry' },
+  { value: 'vanilla', label: 'Vanilla' }
+]
+
+Potate.reacty(Confetti)
+Potate.reacty(Select)
+Potate.reacty(Typewriter);
+
+const App = (props) => {
+  return (<div>
+    <Confetti width={1000} height={1000} />
+    <Select options={options} />
+    <Typewriter
+      words={['Hello Potate', 'I am for React', 'It works!']}
+      loop={5}
+      cursor
+    />
+  </div>)
+}
+
+const root = Potate.createRoot(document.querySelector('#app'))
+root.render(<App/>)
+
+```
+
+
 ## `watch(resource)`
 
 The `watch(resource)` API connects your component to a shared resource and manages the **Suspense** lifecycle. It can be called inside `if` statements, `for` loops, or after early returns.
