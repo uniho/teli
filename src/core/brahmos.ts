@@ -57,11 +57,6 @@ const NoopComponent = (props) => props.children;
 const StrictMode = NoopComponent;
 const Fragment = NoopComponent;
 
-export function reacty(Component: any) {
-  Component.__isReactCompat = true;
-  return Component;
-}
-
 /**
  * Mock for unstable_batchedUpdates as third party lib like Redux uses it.
  * Brahmos by default batches update so we can just call the passed callback directly
@@ -109,6 +104,10 @@ export {createRoot} from './root'
 export {use} from './use';
 export {startTransition} from './hooks';
 export {watch, initWatch} from './watch';
+
+export function reacty(Component: any) {
+  Component.__isReactCompat = true;
+}
 
 /** Export transforms */
 export const jsx = createBrahmosNode;
