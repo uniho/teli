@@ -32,6 +32,10 @@
       "types": "./dist/type.d.ts",
       "import": "./dist/index-esbuild.js"
     },
+    "./server": {
+      "types": "./dist/type.d.ts",
+      "import": "./dist/renderToString.js"
+    },
     "./jsx-runtime": {
       "import": "./dist/index.js",
       "require": "./dist/index.js",
@@ -42,7 +46,7 @@
     "potatejs": "bin/potate-cli.mjs"
   },
   "scripts": {
-    "build": "node ./scripts/build-core.mjs && node ./scripts/build-plugin.mjs",
+    "build": "node ./scripts/build-core.mjs && node ./scripts/build-plugin.mjs && node ./scripts/build-server.mjs",
     "prepublishOnly": "npm run build"
   },
   "repository": {

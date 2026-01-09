@@ -1,4 +1,5 @@
-// @flow
+// core/TemplateTag.ts
+
 import type { PartMeta, TemplateTagType } from './flow.types';
 
 /**
@@ -58,6 +59,13 @@ export default class TemplateTag implements TemplateTagType {
     this.svgTemplate = null;
     this.partsMeta = [];
     this.partMetaCode = partMetaCode;
+  }
+
+  getPartsMeta() {
+    if (!this.partsMeta.length) {
+      this.partsMeta = decodePartMeta(this.partMetaCode);
+    }
+    return this.partsMeta;
   }
 
   create(isSvgPart: boolean) {
