@@ -137,7 +137,7 @@ root.render(<App/>)
 
 ### Using React 3rd party libraries
 
-If you want to use existing 3rd party React libraries or write your own components using React syntax (like style objects, custom event and anymore), just wrap them with `reacty()`.
+If you want to use existing 3rd party React libraries or write your own components using React syntax (like style objects, custom events and more), just wrap them with `reacty()`.
 
 Potate will automatically handle the "React-isms" for that component and its children.
 
@@ -316,7 +316,7 @@ For the above example, the Brahmos output is 685 bytes, compared to 824 bytes fr
 - [x] React Utilities and Methods
 - [x] ⭐⭐⭐ Vite Plugin to transpile JSX to tagged templates
 - [x] ⭐⭐⭐ Esbuild Plugin to transpile JSX to tagged templates
-- [x] ⭐⭐⭐ [reacty(ReactComponet) API](docs/API.md)
+- [x] ⭐⭐⭐ [reacty(ReactComponent) API](docs/API.md)
 - [x] ⭐⭐⭐ [watch(resource) API](docs/API.md)
 - [x] ⭐ The Lanes Light **(Though I haven't cleaned up the no-longer-needed TRANSITION_STATE_TIMED_OUT yet.)**
 - [x] ⭐ The Standalone `startTransition`
