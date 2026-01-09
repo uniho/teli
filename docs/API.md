@@ -1,7 +1,7 @@
 
 # Potate API Documentation
 
-## `reacty(ReactComponet)`
+## `reacty(ReactComponent)`
 
 Declares that a component created for React will be used within Potate. When a component is marked as a React Component, its children are also treated as React components.
 
