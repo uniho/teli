@@ -5,4 +5,4 @@
 * In Native Mode, always use standard HTML attributes. For example, use class instead of className.
 * In Native Mode, always use standard HTML event names. You don't need to use camelCase (e.g., use onclick instead of onClick).
 * In Native Mode, the `style` attribute expects a CSS string, not an object.
-* In Native Mode, use the `innerHTML` property instead of `dangerouslySetInnerHTML`.
+* In Native Mode, use the `innerHTML` property directly (e.g. `<div innerHTML={htmlString} />`) instead of `dangerouslySetInnerHTML`.
