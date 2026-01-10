@@ -1,10 +1,28 @@
 // server/renderToString.js
 
 import {
-  isTagNode,
+  isHtmlTagNode,
+  isTagElementNode,
   isComponentNode,
   isPrimitiveNode,
 } from '../core/brahmosNode';
+
+const VOID_TAGS = {
+  area: 1,
+  base: 1,
+  br: 1,
+  col: 1,
+  embed: 1,
+  hr: 1,
+  img: 1,
+  input: 1,
+  link: 1,
+  meta: 1,
+  param: 1,
+  source: 1,
+  track: 1,
+  wbr: 1,
+};
 
 function escapeHtml(str) {
   if (typeof str !== 'string') return String(str);
@@ -25,7 +43,6 @@ function attributesToString(attributes) {
     if (key === 'children' ||
       key === 'key' ||
       key === 'ref' ||
-      key === 'dangerouslySetInnerHTML' ||
       value === false ||
       value === null ||
       value === undefined) {
@@ -50,6 +67,11 @@ export function renderToString(node) {
     return escapeHtml(node);
   }
 
+  // Support for raw HTML via innerHTML property (similar to Potate Native Component)
+  if (node.innerHTML && typeof node.innerHTML === 'string') {
+    return node.innerHTML;
+  }
+
   if (Array.isArray(node)) {
     return node.map(renderToString).join('');
   }
@@ -69,7 +91,24 @@ export function renderToString(node) {
     }
   }
 
-  if (isTagNode(node)) {
+  // Handle standard VDOM elements (createElement result)
+  if (isTagElementNode(node)) {
+    const tag = node.type;
+    const props = node.props || {};
+    let html = `<${tag}${attributesToString(props)}`;
+
+    if (VOID_TAGS[tag]) {
+      html += ' />';
+    } else {
+      html += '>';
+      if (props.children) html += renderToString(props.children);
+      html += `</${tag}>`;
+    }
+    return html;
+  }
+
+  // Handle Tagged Template Literals (_brahmosHtml result)
+  if (isHtmlTagNode(node)) {
     const { template, values } = node;
     const strings = template.strings;
     const partsMeta = template.getPartsMeta();

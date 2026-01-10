@@ -35,14 +35,14 @@ Add `potatejs` as a dependency.
 npm install potatejs
 ```
 
-Add Potate in your `vite.config.js|.ts` file.
+Add Potate in your `vite.config.ts` file.
 
 ``` js
 import { defineConfig } from 'vite'
-import potatejs from 'potatejs/vite'
+import potate from 'potatejs/vite'
 
 export default defineConfig({
-  plugins: [potatejs()],
+  plugins: [potate()],
 })
 
 ```
@@ -89,6 +89,37 @@ Edit your `index.html`.
   :
   :
 ```
+
+Finally, run the development server to see your Potate app in action!
+
+```bash
+npm run dev
+```
+
+
+### Astro
+
+Add `potatejs` as a dependency.
+
+``` bash
+npm install potatejs
+
+```
+
+> **Note**: Potate is intended to replace React. To avoid conflicts, please ensure that `@astrojs/react` is not installed or enabled in your Astro project.
+
+Add the integration in `astro.config.mjs`.
+
+```js
+import { defineConfig } from 'astro/config';
+import potate from 'potatejs/astro';
+
+export default defineConfig({
+  integrations: [potate()],
+});
+```
+
+Now you can use Potate components (`.jsx`) directly in your `.astro` files.
 
 
 ### Esbuild
@@ -340,13 +371,13 @@ For the above example, the Brahmos output is 685 bytes, compared to 824 bytes fr
 - [x] ⭐ [`<Context>` as a provider](https://react.dev/blog/2024/12/05/react-19#context-as-a-provider)
 - [x] ⭐ [ref as a prop](https://react.dev/blog/2024/12/05/react-19#ref-as-a-prop)
 - [x] ⭐ [startTransition(action) for POST request](https://react.dev/blog/2024/12/05/react-19#actions)
+- [x] ⭐ Handle server rendering(SSR/SSG/renderToString)
 - [ ] ⭐ `use(context)` API
 - [ ] ⭐ [use(store) API](https://react.dev/blog/2025/04/23/react-labs-view-transitions-activity-and-more#concurrent-stores)
 - [ ] ⭐ [Cleanup functions for refs](https://react.dev/blog/2024/12/05/react-19#cleanup-functions-for-refs)
 - [ ] ⭐ [useEffectEvent hook](https://react.dev/reference/react/useEffectEvent)
 - [ ] ⭐ `useImperativeHandle` hook
 - [ ] ⭐ `useInsertionEffect` hook
-- [ ] Handle server rendering(SSR, renderToString)
 - [ ] Clean up
 - [ ] Performance improvement
 - [ ] Bug fixes

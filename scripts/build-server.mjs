@@ -3,6 +3,8 @@ import esbuild from 'esbuild'
 //
 await esbuild.build({
   entryPoints: [
+    "./src/server/astro-render.js",
+    "./src/server/astro-integration.js",
     "./src/server/ssr-vite.js",
   ],
   outdir: 'dist',

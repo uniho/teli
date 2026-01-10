@@ -32,6 +32,14 @@
       "types": "./dist/type.d.ts",
       "import": "./dist/index-esbuild.js"
     },
+    "./astro": {
+      "types": "./dist/type.d.ts",
+      "import": "./dist/astro-integration.js"
+    },
+    "./astro-render": {
+      "types": "./dist/type.d.ts",
+      "import": "./dist/astro-render.js"
+    },
     "./server/vite": {
       "types": "./dist/type.d.ts",
       "import": "./dist/ssr-vite.js"
