@@ -385,6 +385,25 @@ export function useLayoutEffect(callback: () => Function | null | undefined, dep
 }
 
 /**
+ * useImperativeHandle hook
+ */
+export function useImperativeHandle(ref: any, create: () => any, dependencies: Array<any>): void {
+  useLayoutEffect(() => {
+    if (typeof ref === 'function') {
+      const cleanup = ref(create());
+      // React 19: If cleanup is returned, do not call ref(null)
+      if (typeof cleanup === 'function') return cleanup;
+      return () => ref(null);
+    } else if (ref !== null && ref !== undefined) {
+      ref.current = create();
+      return () => {
+        ref.current = null;
+      };
+    }
+  }, dependencies ? dependencies.concat([ref]) : undefined);
+}
+
+/**
  * useDebugValue hook. For now this is just a placeholder,
  * As there is no devtool support it. Revisit it when devtool is supported
  */

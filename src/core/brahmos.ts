@@ -31,6 +31,7 @@ import {
   useContext,
   useTransition,
   useDeferredValue,
+  useImperativeHandle,
   useDebugValue,
 } from './hooks';
 
@@ -80,6 +81,7 @@ export {
   useContext,
   useTransition,
   useDeferredValue,
+  useImperativeHandle,
   useDebugValue,
   createContext,
   forwardRef,

@@ -379,11 +379,11 @@ For the above example, the Brahmos output is 685 bytes, compared to 824 bytes fr
 - [x] ⭐ [ref as a prop](https://react.dev/blog/2024/12/05/react-19#ref-as-a-prop)
 - [x] ⭐ [startTransition(action) for POST request](https://react.dev/blog/2024/12/05/react-19#actions)
 - [x] ⭐ [Cleanup functions for refs](https://react.dev/blog/2024/12/05/react-19#cleanup-functions-for-refs)
+- [x] ⭐ `useImperativeHandle` hook
 - [x] ⭐ Handle server rendering(SSR/SSG/renderToString)
 - [ ] ⭐ `use(context)` API
 - [ ] ⭐ [use(store) API](https://react.dev/blog/2025/04/23/react-labs-view-transitions-activity-and-more#concurrent-stores)
 - [ ] ⭐ [useEffectEvent hook](https://react.dev/reference/react/useEffectEvent)
-- [ ] ⭐ `useImperativeHandle` hook
 - [ ] ⭐ `useInsertionEffect` hook
 - [ ] Clean up
 - [ ] Performance improvement
