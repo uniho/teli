@@ -113,7 +113,7 @@ npm install potatejs
 
 ```
 
-> **Note**: Potate is intended to replace React. To avoid conflicts, please ensure that `@astrojs/react` is not installed or enabled in your Astro project.
+> **Note**: Potate uses its own JSX runtime. To avoid JSX transformation conflicts, please ensure that `@astrojs/react` or other JSX-based integrations are not enabled in your Astro project.
 
 Add the integration in `astro.config.mjs`.
 
