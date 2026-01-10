@@ -1,9 +1,9 @@
 
 # Potate API Documentation
 
-## `reacty(ReactComponent)`
+## `reacty(...ReactComponent)`
 
-Declares that a component created for React will be used within Potate. When a component is marked as a React Component, its children are also treated as React components.
+Declares that components created for React will be used within Potate. Once a component is marked as a React component, all of its descendants (children) are also treated as React components. You can pass multiple components as arguments to mark them all at once.
 
 ### Setup Aliases
 
@@ -51,9 +51,9 @@ npm install react-simple-typewriter
 
 ```jsx
 import Potate from 'potatejs'
-import Confetti from 'react-confetti';
+import Confetti from 'react-confetti'
 import Select from 'react-select'
-import {Typewriter} from 'react-simple-typewriter';
+import {Typewriter} from 'react-simple-typewriter'
 
 const options = [
   { value: 'chocolate', label: 'Chocolate' },
@@ -61,9 +61,7 @@ const options = [
   { value: 'vanilla', label: 'Vanilla' }
 ]
 
-Potate.reacty(Confetti)
-Potate.reacty(Select)
-Potate.reacty(Typewriter);
+Potate.reacty(Confetti, Select, Typewriter)
 
 const App = (props) => {
   return (<div>

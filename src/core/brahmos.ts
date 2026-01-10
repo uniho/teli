@@ -107,8 +107,10 @@ export {use} from './use';
 export {startTransition} from './hooks';
 export {watch, initWatch} from './watch';
 
-export function reacty(Component: any) {
-  Component.__isReactCompat = true;
+export function reacty(...Components: any[]) {
+  Components.forEach((Component) => {
+    Component.__isReactCompat = true;
+  });
 }
 
 /** Export transforms */
