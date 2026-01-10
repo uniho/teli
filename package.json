@@ -36,7 +36,7 @@
       "types": "./dist/type.d.ts",
       "import": "./dist/astro-integration.js"
     },
-    "./astro-render": {
+    "./astro/render": {
       "types": "./dist/type.d.ts",
       "import": "./dist/astro-render.js"
     },
