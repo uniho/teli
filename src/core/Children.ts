@@ -138,8 +138,9 @@ export function cloneElement(node: any, props: ObjectLiteral): BrahmosNode | nul
 
       return {
         ...node,
+        key: props.key !== undefined ? props.key : node.key,
         props: { ...node.props, ...getNormalizedProps(props, includeRef) },
-        ref: includeRef ? null : props.ref,
+        ref: includeRef ? null : (props.ref !== undefined ? props.ref : node.ref),
       };
     }
   }
