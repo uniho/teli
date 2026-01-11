@@ -12,8 +12,8 @@ import type { BrahmosNode, Ref } from './flow.types';
 
 type Configs = { key: string, ref: Ref, children: any };
 
-export function createBrahmosNode(element: string | Function, props: Configs, key: string) {
-  if (!element || (typeof element !== 'string' && typeof element !== 'function')) {
+export function createBrahmosNode(element: string | Function | object, props: Configs, key: string) {
+  if (!element || (typeof element !== 'string' && typeof element !== 'function' && typeof element !== 'object')) {
     let msg =
       'Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: ' +
       (element === null ? 'null' : typeof element) +

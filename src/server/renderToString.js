@@ -82,7 +82,7 @@ export function renderToString(node) {
     const Component = node.type;
     const props = node.props || {};
     
-    if ((Component.prototype && Component.prototype.isReactComponent) || Component.__isReactCompat) {
+    if ((Component.prototype && Component.prototype.isReactComponent) || Component.__isReactCompat || (typeof Component === 'object' && Component !== null)) {
       // Return empty string for React components to allow client-side rendering.
       // This enables support for Astro directives like client:load, where the
       // component is rendered entirely on the client side.
