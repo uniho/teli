@@ -50,14 +50,14 @@ export default defineConfig({
 });
 ```
 
-Now you can use Potate components (`.jsx`) directly in your `.astro` files.
+Now, you can use not only Astro components (`.astro`) but also Potate components (`.jsx` or `.tsx`).
 
-> **Note:** Potate in Astro Islands
+> **Note:** Potate components in Astro Islands
 >
-> * **No directive (Server Only)**: Rendered as just static HTML tags. It results in zero client-side JavaScript. (I used to think there wasn't much point in writing static content in JSX instead of just using `.astro` files. It seemed like standard `.astro` was more than enough. **However, I've realized one major advantage: "SSR EMOTION"** — the ultimate SSR Zero-Runtime CSS-in-JS solution, seamlessly integrated with Astro. By using Potate, your styles are automatically extracted into static CSS during the build process. This means you can enjoy the full power of CSS-in-JS while still shipping zero bytes of JS to the browser. In this regard, it's a significant upgrade over standard `.astro.`)
+> * **No directive (Server Only)**: Rendered as just static HTML tags. It results in zero client-side JavaScript. (I used to think there wasn't much point in writing static content in JSX instead of just using Astro components. It seemed like standard Astro components was more than enough. **However, I've realized one major advantage:** [SSR Emotion for Astro](docs/SSR_EMOTION_FOR_ASTRO.md) — the ultimate SSR Zero-Runtime CSS-in-JS solution, seamlessly integrated with Astro. By using Potate components, your styles are automatically extracted into static CSS during the build process. This means you can enjoy the full power of CSS-in-JS while still shipping zero bytes of JS to the browser. In this regard, it's a significant upgrade over standard Astro components.)
 > * `client:only="potate"` **(Client Only)**: This is the mode where the relationship between Potate and Astro is the clearest. (In this context, Potate plays the same role as React in other integrations.) It skips server-side rendering and runs entirely in the browser.
 >
-> * `client:load`(and others like `client:visible` or `client:idle`) **(SSR Hydration)**: These are for "SSR Hydration." Despite the fancy name, it's not that complicated: it just creates a static HTML skeleton first, and once the JS is ready, the engine takes over the DOM as if it had been there from the start. If you are particular about the visual transition—like ensuring there is no layout shift by pre-setting an image's height—you might want to take control to make the swap feel completely natural.
+> * `client:load`(and others like `client:visible` or `client:idle`) **(SSR Hydration)**: Despite its cool and flashy name, "SSR Hydration" is not that complicated: it just creates a static HTML skeleton first, and once the JS is ready, the engine takes over the DOM as if it had been there from the start. If you are particular about the visual transition—like ensuring there is no layout shift by pre-setting an image's height—you might want to take control to make the swap feel completely natural.
 
 
 ### Vite
