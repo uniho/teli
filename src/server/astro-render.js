@@ -9,7 +9,7 @@ export default {
     // Treat Potate components as functional components
     return typeof Component === 'function';
   },
-  renderToStaticMarkup(Component, props, slots) {
+  async renderToStaticMarkup(Component, props, slots) {
     // Pass slots (HTML strings) as objects with innerHTML
     const children = {};
     if (slots) {
@@ -28,8 +28,15 @@ export default {
       },
     };
 
+    const html = renderToString(node);
+
+    // Dynamic import to avoid bundling issues with Node.js built-ins in esbuild
+    const emotionServer = '@emotion/server';
+    const { extractCritical } = await import(emotionServer);
+    const { ids, css } = extractCritical(html);
+
     return {
-      html: renderToString(node),
+      html: `<style data-emotion="css ${ids.join(' ')}">${css}</style>${html}`,
     };
   },
 };

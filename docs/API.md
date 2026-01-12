@@ -14,8 +14,8 @@ How to setup aliases depends on your environment.
 Potate handles all Vite aliases automatically. However, whether you need to install the `react` package depends on how you use `reacty`:
 
 * **No directive (Server Only)**: The component is rendered as just static HTML tags. Even with `reacty`, `react` **is not required**.
-* `client:only="react"` **(Client Only)**: The component runs only in the browser.  Even with `reacty`, `react` **is not required**.
-* `client:load` / `client:visible` **(SSR Hydration)**: If you want to inject React components using `reacty` within these directives, **you must install `react` as a development dependency.** This acts as a technical dummy for Node.js to resolve third-party imports during the SSR-to-Client handover.
+* `client:only="potate"` **(Client Only)**: The component runs only in the browser.  Even with `reacty`, `react` **is not required**.
+* `client:load`(and others like `client:visible` or `client:idle`) **(SSR Hydration)**: If you want to inject React components using `reacty` within these directives, **you must install `react` as a development dependency.** This acts as a technical dummy for Node.js to resolve third-party imports during the SSR-to-Client handover.
 
 ```bash
 # Only required for SSR Hydration

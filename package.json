@@ -68,7 +68,10 @@
   "bugs": {
     "url": "https://github.com/uniho/potate/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@emotion/css": "^11.13.5",
+    "@emotion/server": "^11.11.0"
+  },
   "devDependencies": {
     "acorn": "^8.15.0",
     "acorn-jsx": "^5.3.2",

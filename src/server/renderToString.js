@@ -51,10 +51,12 @@ function attributesToString(attributes) {
       continue;
     }
 
+    const attrName = key === 'className' ? 'class' : key;
+
     if (value === true) {
-      str += ` ${key}`;
+      str += ` ${attrName}`;
     } else {
-      str += ` ${key}="${escapeHtml(value)}"`;
+      str += ` ${attrName}="${escapeHtml(value)}"`;
     }
   }
   return str;
