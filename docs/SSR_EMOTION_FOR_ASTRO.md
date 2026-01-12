@@ -130,7 +130,7 @@ export const Card = () => (
 
 ### Styled Components (MUI-like)
 
-If you prefer the Styled Components pattern (popularized by libraries like MUI or styled-components), Potate makes it incredibly easy to implement.
+If you prefer the Styled Components pattern (popularized by libraries like MUI or styled-components), `Emotion` makes it incredibly easy to implement.
 
 Even with this sophisticated API, the result remains the same: Zero-Runtime CSS. All styles are pre-calculated during SSR and extracted into static CSS files.
 
@@ -162,4 +162,4 @@ export const styled = (Tag, options) => (style, ...values) => props => {
 
 > **Note:** What is the sx prop? For those unfamiliar with libraries like [MUI, the sx prop](https://mui.com/system/getting-started/the-sx-prop/) is a popular pattern that allows you to apply "one-off" styles directly to a component.
 >
-> In this implementation, the sx prop is merged with the component's base styles. This gives you the flexibility to tweak margins or colors on a specific instance without needing to define a new styled component every time.
+> In this implementation, you can pass raw style objects to the sx prop without wrapping them in `css()` or "The Patterns" functions (whether that's actually convenient or not is another story 🤤).
