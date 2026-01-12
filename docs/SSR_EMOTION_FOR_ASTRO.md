@@ -1,4 +1,4 @@
-# SSR Emotion for Astro
+# SSR [Emotion](https://emotion.sh/docs/@emotion/css) for Astro
 
 A natural and powerful Zero-Runtime CSS-in-JS solution, seamlessly integrated with Astro.
 
@@ -6,21 +6,21 @@ A natural and powerful Zero-Runtime CSS-in-JS solution, seamlessly integrated wi
 
 I used to think there wasn't much point in writing static content in JSX components (`.jsx` or `.tsx` files) instead of just using Astro components (`.astro` files). It seemed like standard Astro components were more than enough for most cases, because I thought having frontmatter, the HTML tag section, and the style section was all I ever needed.
 
-However, I've realized one major advantage: "SSR EMOTION". While other frameworks often struggle with complex configurations to get `Emotion` working with SSR, Potate bridges this gap naturally. It allows you to use the power of CSS-in-JS without any of the typical performance trade-offs.
+However, I've realized one major advantage: "SSR EMOTION". While other frameworks often struggle with complex configurations to get [Emotion](https://emotion.sh/docs/@emotion/css) working with SSR, Potate bridges this gap naturally. It allows you to use the power of CSS-in-JS without any of the typical performance trade-offs.
 
 ## 💎 The Result
 
 * **Zero Runtime by default:** No `Emotion` library is shipped to the browser. It delivers a pure Zero-JS experience.
-* **Familiar DX:** Use the full expressive power of the Emotion `css()` function that you already know.
+* **Familiar DX:** Use the full expressive power of the [Emotion `css()` function](https://emotion.sh/docs/@emotion/css) that you already know.
 * **Static by Default:** Styles are automatically extracted into static CSS during the Astro build process.
 * **Performance:** No hydration overhead for styles and no Flash of Unstyled Content (FOUC).
 
 
 ## 🛠 How it looks
 
-In Potate, you don't need to learn any special properties or complex setups. It just works with the standard `class` attribute and the Emotion `css()` function. It feels completely natural, even in Astro's **"No directive" (Server Only)** mode.
+In Potate, you don't need to learn any special properties or complex setups. It just works with the standard `class` attribute and the [Emotion `css()` function](https://emotion.sh/docs/@emotion/css). It feels completely natural, even in Astro's **"No directive" (Server Only)** mode.
 
-While you can use `css()` directly, you can also create reusable functions like `flexCol()` (which we call **"The Patterns"**).
+While you can use [`css()`](https://emotion.sh/docs/@emotion/css) directly, you can also create reusable functions like `flexCol()` (which we call **"The Patterns"**).
 
 ```jsx
 import { css } from '@emotion/css'
