@@ -10,16 +10,17 @@ However, I've realized one major advantage: "SSR EMOTION". While other framework
 
 ## 💎 The Result
 
-* **Zero Runtime:** No Emotion library is shipped to the browser. It delivers a pure Zero-JS experience.
+* **Zero Runtime by default:** No `Emotion` library is shipped to the browser. It delivers a pure Zero-JS experience.
 * **Familiar DX:** Use the full expressive power of the Emotion `css()` function that you already know.
 * **Static by Default:** Styles are automatically extracted into static CSS during the Astro build process.
 * **Performance:** No hydration overhead for styles and no Flash of Unstyled Content (FOUC).
+
 
 ## 🛠 How it looks
 
 In Potate, you don't need to learn any special properties or complex setups. It just works with the standard `class` attribute and the Emotion `css()` function. It feels completely natural, even in Astro's **"No directive" (Server Only)** mode.
 
-While you can use `css()` directly, you can also create reusable functions like `flexCol()` (which we call **"Patterns"**).
+While you can use `css()` directly, you can also create reusable functions like `flexCol()` (which we call **"The Patterns"**).
 
 ```jsx
 import { css } from '@emotion/css'
@@ -40,7 +41,54 @@ const flexCol = (...args) => css({
 
 ```
 
-## 🛠 Patterns Example
+## 🌗 Hybrid Styling (SSR + CSR)
+
+In Potate, Island components (`client:*`) get the best of both worlds.
+
+### How it works
+
+1. At Build Time (SSR): Potate executes your `css()` calls and extracts the initial styles into a static CSS file. This ensures your component looks perfect even before JavaScript loads.
+
+2. At Runtime (Hydration): Once the Island hydrates in the browser, the Emotion runtime takes over.
+
+### Why this is powerful
+
+Because the Emotion runtime remains active inside Islands, you can use standard React/Preact patterns to handle dynamic styles without any special "Potate-specific" APIs.
+
+### Example: Hydration-aware Styling
+
+You can easily change styles when the component "wakes up" in the browser:
+
+```jsx
+export const InteractiveBox = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(true); // Triggers once JS is active
+  }, []);
+
+  return (
+    <div class={css({
+      // Red on server (SEO/LCP friendly), Blue once interactive!
+      background: isLoaded ? 'blue' : 'red',
+      transition: 'background 0.5s',
+      padding: '20px'
+    })}>
+      {isLoaded ? 'I am Interactive!' : 'I am Static HTML'}
+    </div>
+  );
+};
+
+```
+
+### Key Benefits
+
+* **No FOUC (Flash of Unstyled Content):** Since the "Server Side" style is already in the static CSS, there's no flickering.
+* **Unlimited Flexibility:** Need to change colors based on user input or mouse position? Just pass the props/state to css() like you always do.
+* **Zero Learning Curve:** If you know how to use useEffect and Emotion, you already know how to build dynamic Islands with Potate.
+
+
+## 🛠 The Patterns 
 
 ### LinkOverlay
 
