@@ -136,7 +136,6 @@ Even with this sophisticated API, the result remains the same: Zero-Runtime CSS.
 
 ```jsx
 import {css, keyframes, injectGlobal, cx} from '@emotion/css'
-import * as patterns from './my-patterns'
 
 export const styled = (Tag, options) => (style, ...values) => props => {
   const makeClassName = (style, ...values) =>
