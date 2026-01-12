@@ -72,8 +72,8 @@ export function renderToString(node) {
   }
 
   // Support for raw HTML via innerHTML property (similar to Potate Native Component)
-  if (node.innerHTML && typeof node.innerHTML === 'string') {
-    return node.innerHTML;
+  if (node.innerHTML) {
+    return String(node.innerHTML);
   }
 
   if (Array.isArray(node)) {
