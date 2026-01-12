@@ -132,7 +132,7 @@ export const Card = () => (
 
 If you prefer the Styled Components pattern (popularized by libraries like MUI or styled-components), `Emotion` makes it incredibly easy to implement.
 
-Even with this sophisticated API, the result remains the same: Zero-Runtime CSS. All styles are pre-calculated during SSR and extracted into static CSS files.
+Even with this minimal custom (but powerful) function, the result remains the same: Zero-Runtime CSS. All styles are pre-calculated during SSR and extracted into static CSS files.
 
 ```jsx
 import {css, keyframes, injectGlobal, cx} from '@emotion/css'
