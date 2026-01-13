@@ -116,11 +116,8 @@ export function reacty(...Components: any[]) {
 /** Export transforms */
 export const jsx = createBrahmosNode;
 export const jsxs = createBrahmosNode;
-export const jsxDev = createBrahmosNode;
+export const jsxDEV = createBrahmosNode;
 export { html };
-
-import { setCurrentComponentFiber } from './fiber';
-import functionalComponentInstance from './functionalComponentInstance';
 
 /**
  * TODO: Remove this export once the Dispatcher pattern is implemented.
@@ -137,6 +134,8 @@ import functionalComponentInstance from './functionalComponentInstance';
  * When that refactoring is complete, `renderToString` will no longer need access
  * to these internals, and this export should be deleted.
  */
+import { setCurrentComponentFiber } from './fiber';
+import functionalComponentInstance from './functionalComponentInstance';
 export const __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = {
   setCurrentComponentFiber,
   functionalComponentInstance,
