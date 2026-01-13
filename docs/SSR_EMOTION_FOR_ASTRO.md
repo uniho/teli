@@ -60,6 +60,8 @@ Because the Emotion runtime remains active inside Islands, you can use standard 
 You can easily change styles when the component "wakes up" in the browser:
 
 ```jsx
+// src/components/InteractiveBox.jsx
+
 export const InteractiveBox = () => {
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -78,6 +80,22 @@ export const InteractiveBox = () => {
     </div>
   );
 };
+
+```
+
+```astro
+---
+// src/pages/index.astro
+
+import Layout from '../layouts/Layout.astro';
+import StaticBox from '../components/StaticBox';
+import InteractiveBox from '../components/InteractiveBox';
+---
+
+<Layout>
+  <StaticBox />
+  <InteractiveBox client:load />
+</Layout>
 
 ```
 
