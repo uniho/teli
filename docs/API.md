@@ -11,16 +11,19 @@ How to setup aliases depends on your environment.
 
 #### For Astro
 
-Potate handles all Vite aliases automatically. However, whether you need to install the `react` package depends on how you use `reacty`:
+Potate handles all Vite aliases automatically. However, whether you need to install the `a technical dummy react package for Node.js` depends on how you use `reacty`:
 
-* **No directive (Server Only)**: The component is rendered as just static HTML tags. Even with `reacty`, `react` **is not required**.
-* `client:only="potate"` **(Client Only)**: The component runs only in the browser.  Even with `reacty`, `react` **is not required**.
-* `client:load`(and others like `client:visible` or `client:idle`) **(SSR Hydration)**: If you want to inject React components using `reacty` within these directives, **you must install `react` as a development dependency.** This acts as a technical dummy for Node.js to resolve third-party imports during the SSR-to-Client handover.
+* **No directive (Server Only)**: The component is rendered as just static HTML tags. However, components registered with `reacty` are skipped because Potate cannot convert React Components into HTML strings. Therefore, using React components in this mode is completely pointless. In this case, `a technical dummy react package for Node.js` **is not required**.
+* `client:only="potate"` **(Client Only)**: The component runs only in the browser. Since the server is bypassed entirely, there is no need for `a technical dummy react package for Node.js`.
+* `client:load`(and others like `client:visible` or `client:idle`) **(SSR Hydration)**: If you want to inject React components using `reacty` within these directives, **you must install `react` as a development dependency.** This acts as `a technical dummy react package for Node.js` to resolve third-party imports during the SSR-to-Client handover.
 
 ```bash
 # Only required for SSR Hydration
 npm install -D react
 ```
+
+> **Note:** It may go without saying, `a technical dummy react package for Node.js` is never included in the final client-side JavaScript bundle.
+
 
 #### For Pure Vite
 
