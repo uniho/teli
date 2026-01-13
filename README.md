@@ -60,6 +60,12 @@ Now, you can use not only Astro components (`.astro`) but also Potate JSX compon
 > * `client:load`(and others like `client:visible` or `client:idle`) **(SSR Hydration)**: Despite its cool and flashy name, "SSR Hydration" is not that complicated: it just creates a static HTML skeleton first, and once the JS is ready, the engine takes over the DOM as if it had been there from the start. If you are particular about the visual transition—like ensuring there is no layout shift by pre-setting an image's height—you might want to take control to make the swap feel completely natural.
 
 
+#### LIVE DEMO with Astro
+
+[Here](https://stackblitz.com/edit/github-cywxrcwm-3n79zz3t?file=src%2Fcomponents%2FPotate.jsx
+) is a live demo with Astro on StackBlitz.
+
+
 ### Vite
 
 Create your new app with `select a framework: > Vanilla`.
