@@ -45,9 +45,6 @@ import { forwardRef, createRef } from './refs';
 /** unmountComponentAtNode */
 import unmountComponentAtNode from './unmountComponentAtNode';
 
-/** unstableBatchedUpdate */
-import { deferredUpdates, flushSync } from './updateUtils';
-
 /** import top level api */
 import { Children, isValidElement, cloneElement } from './Children';
 
@@ -96,10 +93,6 @@ export {
   Children,
   isValidElement,
   cloneElement,
-  // Schedule updates with Transition priority (Idle/Scheduler) - Similar to startTransition but global
-  deferredUpdates as unstable_deferredUpdates,
-  // Force immediate synchronous updates (No Batching) - Matches React flushSync
-  flushSync,
   unstable_batchedUpdates,
   memo,
   StrictMode,
@@ -109,6 +102,8 @@ export {
 export {createRoot} from './root'
 export {use} from './use';
 export {startTransition} from './hooks';
+export {flushSync} from './updateUtils';
+
 export {watch, initWatch} from './watch';
 
 export function reacty(...Components: any[]) {

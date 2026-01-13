@@ -3,7 +3,6 @@
 import { afterCurrentStack } from './utils';
 import {
   PREDEFINED_TRANSITION_SYNC,
-  PREDEFINED_TRANSITION_DEFERRED,
   getTransitionFromFiber,
 } from './transitionUtils';
 import {
@@ -138,11 +137,6 @@ export function getPendingUpdates(fiber: Fiber): PendingUpdates {
   return brahmosData[pendingUpdatesKey].filter(
     (stateMeta) => stateMeta.transitionId === currentTransitionId,
   );
-}
-
-// function to trigger deferred updates
-export function deferredUpdates(cb: Function): void {
-  withTransition(PREDEFINED_TRANSITION_DEFERRED, cb);
 }
 
 export function flushSync(cb: Function): any {

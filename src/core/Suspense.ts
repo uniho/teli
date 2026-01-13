@@ -1,4 +1,5 @@
-// @flow
+// core/Suspense.ts
+
 import { createBrahmosNode, Component } from './circularDep';
 
 import { forwardRef } from './refs';
@@ -8,7 +9,7 @@ import {
   getTransitionFromFiber,
   isTransitionCompleted,
 } from './transitionUtils';
-import { withTransition, deferredUpdates } from './updateUtils';
+import { withTransition } from './updateUtils';
 import reRender from './reRender';
 import {
   BRAHMOS_DATA_KEY,
@@ -352,7 +353,7 @@ class SuspenseManager {
     // trigger rerender on specific intervals
     setTimeout(() => {
       if (transitionTimedOut || !pendingSuspense.includes(component)) {
-        deferredUpdates(doSuspenseRerender);
+        withTransition(PREDEFINED_TRANSITION_DEFERRED, doSuspenseRerender);
       } else {
         withTransition(transition, doSuspenseRerender);
       }

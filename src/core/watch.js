@@ -1,8 +1,9 @@
 // core/watch.js
 
 import { getCurrentComponentFiber, getFiberFromComponent, markPendingEffect } from './fiber';
-import { withUpdateSource, flushSync } from './updateUtils';
-import { BRAHMOS_DATA_KEY, EFFECT_TYPE_OTHER, UPDATE_SOURCE_TRANSITION } from './configs';
+import { withTransition, flushSync } from './updateUtils';
+import { PREDEFINED_TRANSITION_DEFERRED } from './transitionUtils';
+import { BRAHMOS_DATA_KEY, EFFECT_TYPE_OTHER } from './configs';
 import reRender from './reRender';
 import { handlePromise } from './use';
 import { startTransition } from './hooks';
@@ -88,7 +89,7 @@ function watchBase(usable, option = {}) {
           if (option.sync) {
             flushSync(update);
           } else {
-            withUpdateSource(UPDATE_SOURCE_TRANSITION, update);
+            withTransition(PREDEFINED_TRANSITION_DEFERRED, update);
           }
         }
       };
