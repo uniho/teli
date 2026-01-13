@@ -1,7 +1,8 @@
-// src/core/watch.js
+// core/watch.js
+
 import { getCurrentComponentFiber, getFiberFromComponent, markPendingEffect } from './fiber';
-import { withUpdateSource } from './updateUtils';
-import { BRAHMOS_DATA_KEY, EFFECT_TYPE_OTHER, UPDATE_SOURCE_IMMEDIATE_ACTION, UPDATE_SOURCE_TRANSITION } from './configs';
+import { withUpdateSource, flushSync } from './updateUtils';
+import { BRAHMOS_DATA_KEY, EFFECT_TYPE_OTHER, UPDATE_SOURCE_TRANSITION } from './configs';
 import reRender from './reRender';
 import { handlePromise } from './use';
 import { startTransition } from './hooks';
@@ -77,16 +78,18 @@ function watchBase(usable, option = {}) {
       const listener = () => {
         const latestFiber = getFiberFromComponent(inst);
         if (latestFiber) {
-          /**
-           * Wrap the re-render call with an explicit update source.
-           */
-          const lane = option.sync ? UPDATE_SOURCE_IMMEDIATE_ACTION : UPDATE_SOURCE_TRANSITION;
-          withUpdateSource(lane, () => {
+          const update = () => {
             // Trigger the engine's re-render cycle.
             inst[BRAHMOS_DATA_KEY].isDirty = true;
             markPendingEffect(latestFiber, EFFECT_TYPE_OTHER);
             reRender(inst);
-          });        
+          };
+
+          if (option.sync) {
+            flushSync(update);
+          } else {
+            withUpdateSource(UPDATE_SOURCE_TRANSITION, update);
+          }
         }
       };
 
