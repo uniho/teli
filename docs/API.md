@@ -28,8 +28,13 @@ If you are using Potate in a standalone Vite project, you must manually configur
 
 ```js
 // vite.config.ts
-export default defineConfig({
+import { defineConfig } from 'vite'
+import potate from 'potatejs/vite'
 
+export default defineConfig({
+  plugins: [potate()],
+
+  // Add the following
   resolve: {
     alias: {
       'react': 'potatejs',
@@ -37,7 +42,7 @@ export default defineConfig({
       'react/jsx-runtime': 'potatejs',
     },
   },
-
+  
 });
 
 ```
