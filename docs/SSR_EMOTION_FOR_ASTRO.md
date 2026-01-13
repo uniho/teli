@@ -146,8 +146,8 @@ const bw = (min, max, ...args) => css({[`@media ${_gt(min)} and ${_lt(max)}`]: a
 export default props => (
   <div class={css(
     { color: 'black' }, // default css
-		bw('sm', '75rem', { color: 'blue' }), // between
-		gt('75rem', { color: 'red' }), // greater than
+    bw('sm', '75rem', { color: 'blue' }), // between
+    gt('75rem', { color: 'red' }), // greater than
   )}>
     Responsive Design!
   </div>
