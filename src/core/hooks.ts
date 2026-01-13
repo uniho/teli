@@ -412,6 +412,14 @@ export function useDebugValue() {
 }
 
 /**
+ * useId hook
+ */
+export function useId(): string {
+  const [id] = useState(() => getUniqueId());
+  return id;
+}
+
+/**
  * Create context hook
  */
 export function useContext(Context: ContextType): any {

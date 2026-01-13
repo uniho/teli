@@ -33,6 +33,7 @@ import {
   useDeferredValue,
   useImperativeHandle,
   useDebugValue,
+  useId,
 } from './hooks';
 
 /** createContext */
@@ -83,6 +84,7 @@ export {
   useDeferredValue,
   useImperativeHandle,
   useDebugValue,
+  useId,
   createContext,
   forwardRef,
   createRef,
