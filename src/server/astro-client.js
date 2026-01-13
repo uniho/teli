@@ -1,13 +1,17 @@
 // server/astro-client.js
 
-import { createElement, createRoot } from 'potatejs';
+import { createElement, render } from 'potatejs';
 
 export default (element) => {
   return (Component, props, slots, { client }) => {
-    // Clear SSR content (Hydration mismatch workaround)
-    element.innerHTML = '';
+    // Create an in-memory container (not attached to the DOM).
+    const cache = document.createElement('div');
 
-    const root = createRoot(element);
-    root.render(createElement(Component, props));
+    // Render synchronously into the cache.
+    // 'render' (unlike createRoot) is synchronous, so the DOM is ready immediately after this call.
+    render(createElement(Component, props), cache);
+
+    // Swap the SSR content with the newly rendered CSR content instantly.
+    element.replaceChildren(...Array.from(cache.childNodes));
   }
 }
