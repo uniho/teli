@@ -6,6 +6,7 @@ await esbuild.build({
     "./src/server/astro-render.js",
     "./src/server/astro-integration.js",
     "./src/server/astro-client.js",
+    "./src/server/vite-integration.js",
     "./src/server/ssr-vite.js",
   ],
   outdir: 'dist',

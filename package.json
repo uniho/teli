@@ -24,6 +24,10 @@
       "require": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./vite": {
+      "types": "./dist/type.d.ts",
+      "import": "./dist/vite-integration.js"
+    },
     "./vite/jsx": {
       "types": "./dist/type.d.ts",
       "import": "./dist/index-vite-jsx.js"
@@ -43,10 +47,6 @@
     "./astro/client": {
       "types": "./dist/type.d.ts",
       "import": "./dist/astro-client.js"
-    },
-    "./server/vite": {
-      "types": "./dist/type.d.ts",
-      "import": "./dist/ssr-vite.js"
     },
     "./jsx-runtime": {
       "import": "./dist/index.js",
