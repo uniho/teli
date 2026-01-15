@@ -1,3 +1,4 @@
+// core/scheduler.ts
 
 import { PREDEFINED_TRANSITION_DEFERRED } from './transitionUtils';
 
