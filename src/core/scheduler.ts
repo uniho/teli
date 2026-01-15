@@ -17,7 +17,7 @@ if (typeof requestAnimationFrame !== 'undefined') {
   });
 }
 
-const getTime = () => performance.now();
+const getTime = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
 
 const timedOutRemaining: TimeRemaining = () => true;
 
@@ -39,6 +39,10 @@ if (typeof MessageChannel !== 'undefined') {
     channelCallbacks.forEach((handle) => handle());
   };
   port = channel.port2;
+  if (typeof channel.port1.unref === 'function') {
+    channel.port1.unref();
+    channel.port2.unref();
+  }
 }
 
 function schedule(cb) {
