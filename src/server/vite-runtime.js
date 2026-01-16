@@ -1,8 +1,13 @@
 // server/vite-runtime.js
 
-export default ({initName, pageRoot}) => `
+export default ({initName, pageRoot, clientModules}) => {
+  const modulesCode = clientModules
+    ? `const modules = { ${clientModules.join(',\n    ')} };`
+    : `const modules = import.meta.glob('/src/${pageRoot}/**/*.{js,ts,jsx,tsx}');`;
+
+  return `
   import { createElement, render } from 'potatejs'; 
-  const modules = import.meta.glob('/src/${pageRoot}/**/*.{js,ts,jsx,tsx}');
+  ${modulesCode}
   const initModules = import.meta.glob('/src/${initName}.{js,ts}');
 
   async function boot() {
@@ -18,9 +23,11 @@ export default ({initName, pageRoot}) => `
     for (const el of islands) {
       const { island: rawName, client: mode } = el.dataset;
       const [name, exportName] = (rawName || '').split(':');
+      const cleanName = name.startsWith('/') ? name.slice(1) : name;
       const path = Object.keys(modules).find(p => {
         const noExt = p.replace(/\\.[^/.]+$/, "");
-        return noExt.endsWith(\`/\${name}\`);
+        // Use concatenation to avoid template literal confusion
+        return noExt === '/src/${pageRoot}/' + cleanName;
       });
 
       if (!path) {
@@ -40,4 +47,5 @@ export default ({initName, pageRoot}) => `
   }
 
   boot();
-`
+`;
+}

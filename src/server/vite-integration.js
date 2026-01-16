@@ -1,7 +1,6 @@
 // server/vite-integration.js
 
 import potateVite from '../plugin/index-vite-jsx';
-import runtime from '../server/vite-runtime';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,13 +8,14 @@ import crypto from 'node:crypto';
 import { ViteNodeServer } from 'vite-node/server';
 import { ViteNodeRunner } from 'vite-node/client';
 import { createServer } from 'vite';
+import getViteRuntime from './vite-runtime.js';
 
 const pageRoot = 'pages';
 const initName = '_init';
 
 export default function(options = {}) {
 
-  let viteConfig, devServer, runner, localServer, runtimeRefId
+  let viteConfig, devServer, runner, nodeServer, runtimeRefId
 
   const RUNTIME_PUBLIC_ID = 'virtual:potate-runtime';
   const RUNTIME_INTERNAL_ID = '\0' + RUNTIME_PUBLIC_ID;
@@ -35,18 +35,18 @@ export default function(options = {}) {
       const projectRoot = process.cwd();
       const root = userConfig.root || projectRoot;
 
-      // MPA対応: root/index.html を確認し、src/pages 以下のコンポーネントから仮想HTMLエントリーを生成する
+      // MPA support: Check root/index.html and generate virtual HTML entries from components under src/pages
       const input = {};
       const pagesDir = path.resolve(root, `src/${pageRoot}`);
 
-      // 1. 物理的なHTMLファイルは index.html のみ許可
+      // Only index.html is allowed as a physical HTML file
       const indexHtml = path.resolve(root, 'index.html');
       if (!fs.existsSync(indexHtml)) {
         throw new Error(`[potate] index.html not found in root: ${root}`);
       }
       input['index'] = indexHtml;
 
-      // 2. src/pages をスキャンして仮想HTMLを登録する (File System Routing)
+      // Scan src/pages and register virtual HTML (File System Routing)
       const scanPages = (dir, baseRoute = '') => {
         if (!fs.existsSync(dir)) return;
         const files = fs.readdirSync(dir);
@@ -55,28 +55,28 @@ export default function(options = {}) {
           const stat = fs.statSync(filePath);
           
           if (stat.isDirectory()) {
-            // _ で始まるディレクトリは除外 (例: src/pages/_components)
+            // Exclude directories starting with _ (e.g. src/pages/_components)
             if (file.startsWith('_')) continue;
             scanPages(filePath, path.join(baseRoute, file));
           } else if (/\.(jsx|tsx|js|ts)$/.test(file)) {
             const ext = path.extname(file);
             const basename = path.basename(file, ext);
             
-            // _xxxx.js などのファイルは除外
+            // Exclude files like _xxxx.js
             if (basename.startsWith('_')) continue;
 
-            // ルートパスの決定
+            // Determine route path
             let routeName = path.join(baseRoute, basename === 'index' ? '' : basename);
-            routeName = routeName.replace(/\\/g, '/'); // Windows対応
+            routeName = routeName.replace(/\\/g, '/'); // Windows support
             
-            // ルート(index)は物理ファイルを使用するためスキップ
+            // Skip root (index) as it uses the physical file
             if (!routeName || routeName === '.') continue;
 
-            // エントリー名 (distに出力されるパス: about -> about/index.html)
+            // Entry name (output path in dist: about -> about/index.html)
             const entryName = `${routeName}/index`;
 
-            // 仮想的なHTMLファイルパスを生成 (ViteにHTMLとして認識させるため .html で終わらせる)
-            // 物理ファイルは存在しないため、resolveId/load で処理する
+            // Generate virtual HTML file path (end with .html for Vite recognition)
+            // Handle with resolveId/load since physical file does not exist
             const virtualPath = path.resolve(root, `${entryName}.html`);
             input[entryName] = virtualPath;
             virtualHtmlMap.add(virtualPath);
@@ -84,7 +84,7 @@ export default function(options = {}) {
         }
       };
       
-      // ビルド時かつ input が未指定の場合のみスキャンを実行
+      // Execute scan only during build when input is not specified
       if (!userConfig.build?.rollupOptions?.input) {
         scanPages(pagesDir);
       }
@@ -98,8 +98,8 @@ export default function(options = {}) {
             'react/jsx-runtime': 'potatejs',
           },
         },
-        ssr: {external: ['@emotion/css', '@emotion/server']},
-        optimizeDeps: {exclude: ['@emotion/css', '@emotion/server']},
+        ssr: { noExternal: ['@emotion/css', '@emotion/server', 'potatejs'] },
+        optimizeDeps: { exclude: ['@emotion/css', '@emotion/server', 'potatejs'] },
         build: {
           rollupOptions: {
             input
@@ -110,7 +110,61 @@ export default function(options = {}) {
 
     configResolved(config) { viteConfig = config; },
 
-    configureServer(server) { devServer = server; },
+    configureServer(server) {
+      devServer = server;
+      // Create the SSR runner and server once for dev mode and reuse them on every request.
+      nodeServer = new ViteNodeServer(server);
+      runner = new ViteNodeRunner({
+        root: server.config.root,
+        fetchModule: id => nodeServer.fetchModule(id),
+        resolveId: (id, importer) => nodeServer.resolveId(id, importer),
+      });
+
+      // Middleware to serve virtual HTML files in development mode
+      server.middlewares.use(async (req, res, next) => {
+        const url = req.url?.split('?')[0];
+        if (!url || req.method !== 'GET') return next();
+
+        let targetPath = url;
+        
+        // Handle extension-less paths (e.g. /about)
+        if (!path.extname(targetPath)) {
+          if (!targetPath.endsWith('/')) {
+             // Check if this is a virtual route
+             const potentialHtml = path.resolve(viteConfig.root, targetPath.slice(1), 'index.html');
+             if (virtualHtmlMap.has(potentialHtml)) {
+                // Redirect /about to /about/
+                res.statusCode = 301;
+                res.setHeader('Location', url + '/');
+                res.end();
+                return;
+             }
+          } else {
+             targetPath += 'index.html';
+          }
+        }
+
+        if (targetPath.endsWith('.html')) {
+           const absolutePath = path.resolve(viteConfig.root, targetPath.startsWith('/') ? targetPath.slice(1) : targetPath);
+           
+           if (virtualHtmlMap.has(absolutePath)) {
+             try {
+               const template = fs.readFileSync(path.resolve(viteConfig.root, 'index.html'), 'utf-8');
+               const html = await server.transformIndexHtml(url, template, req.originalUrl);
+               
+               res.statusCode = 200;
+               res.setHeader('Content-Type', 'text/html');
+               res.end(html);
+               return;
+             } catch (e) {
+               return next(e);
+             }
+           }
+        }
+        
+        next();
+      });
+    },
 
     buildStart() {
       if (viteConfig.command === 'build') {
@@ -132,12 +186,36 @@ export default function(options = {}) {
     
     load(id) {
       if (id === RUNTIME_INTERNAL_ID) {
-        return runtime({initName, pageRoot});
+        const clientModules = [];
+        const pagesDir = path.resolve(viteConfig.root, `src/${pageRoot}`);
+
+        const scanDirForClientModules = (dir, base = '') => {
+          if (!fs.existsSync(dir)) return;
+          const files = fs.readdirSync(dir, { withFileTypes: true });
+
+          for (const file of files) {
+            const filePath = path.join(dir, file.name);
+
+            if (file.isDirectory()) {
+              if (file.name.startsWith('_')) continue;
+              scanDirForClientModules(filePath, path.join(base, file.name));
+            } else if (/\.(jsx|tsx|js|ts)$/.test(file.name)) {
+              if (file.name.startsWith('_')) continue;
+              
+              const relativePath = path.join(base, file.name).replace(/\\/g, '/');
+              const importPath = `/src/${pageRoot}/${relativePath}`;
+              clientModules.push(`'${importPath}': () => import('${importPath}')`);
+            }
+          }
+        };
+        scanDirForClientModules(pagesDir);
+        return getViteRuntime({ initName, pageRoot, clientModules });
       }
 
       if (virtualHtmlMap.has(id)) {
         const templatePath = path.resolve(viteConfig.root, 'index.html');
-        return fs.readFileSync(templatePath, 'utf-8');
+        const html = fs.readFileSync(templatePath, 'utf-8');
+        return `<!--POTATE_ID:${id}-->\n${html}`;
       }
 
       if (id.startsWith(`\0${RUNNER_PUBLIC_ID}:`)) {
@@ -177,8 +255,8 @@ export default function(options = {}) {
             const pageProps = typeof mod.main === 'function' ? await mod.main() : {};
             const props = { ...globalProps, ...pageProps };
 
-            if (mod.island) {
-              const Layout = mod.island;
+            if (mod.body) {
+              const Layout = mod.body;
               const node = {
                 nodeType: FUNCTIONAL_COMPONENT_NODE,
                 type: Layout,
@@ -212,8 +290,8 @@ export default function(options = {}) {
               const { extractCritical } = await import('@emotion/server');
               return { html: newHtml, ...extractCritical(newHtml) };
             } else {
-              // Fallback: island エクスポートがない場合は、default エクスポートをメインコンテンツとして扱う
-              // これにより、シンプルなページは export default だけで動作する
+              // Fallback: Treat default export as main content if no island export exists
+              // This allows simple pages to work with just export default
               const Component = mod.App || mod.default;
               if (Component) {
                 const node = { nodeType: FUNCTIONAL_COMPONENT_NODE, type: Component, props: { ...props, children: slot ? { innerHTML: slot } : undefined } };
@@ -232,6 +310,46 @@ export default function(options = {}) {
     async transformIndexHtml(html, ctx) {
       let server = ctx?.server;
 
+      // This function will be used in both dev and build
+      const ssrRender = async (componentName, slot) => {
+        if (devServer) {
+          // Dev mode: Reuse the existing runner after clearing ALL caches.
+          // This is critical to prevent state (like hooks) from leaking between requests.
+          runner.moduleCache.clear();
+          nodeServer.moduleCache.clear();
+
+          const mod = await runner.executeId(`${RUNNER_PUBLIC_ID}:${componentName}`);
+          const result = await mod.run(slot);
+          return { ...result, client: mod.client };
+        } else {
+          // Build mode: Create a temporary, isolated server and runner for each page.
+          const serverForRender = await createServer({
+              root: viteConfig.root,
+              configFile: viteConfig.configFile,
+              server: { middlewareMode: true, hmr: false },
+              optimizeDeps: { noDiscovery: true, include: [] },
+              ssr: { noExternal: ['@emotion/css', '@emotion/server', 'potatejs'] },
+              plugins: [potateVite()]
+          });
+          try {
+            const nodeServerForRender = new ViteNodeServer(serverForRender);
+            const nodeRunnerForRender = new ViteNodeRunner({ root: serverForRender.config.root, fetchModule: id => nodeServerForRender.fetchModule(id), resolveId: (id, importer) => nodeServerForRender.resolveId(id, importer) });
+            const mod = await nodeRunnerForRender.executeId(`${RUNNER_PUBLIC_ID}:${componentName}`);
+            const result = await mod.run(slot);
+            return { ...result, client: mod.client };
+          } finally {
+            await serverForRender.close();
+          }
+        }
+      }
+
+      let virtualId = null;
+      const idMatch = html.match(/<!--POTATE_ID:(.*?)-->/);
+      if (idMatch) {
+        virtualId = idMatch[1];
+        html = html.replace(idMatch[0], '');
+      }
+
       // Mask comments to avoid matching islands inside them
       const comments = [];
       let processedHtml = html.replace(/<!--[\s\S]*?-->/g, (m) => {
@@ -239,18 +357,18 @@ export default function(options = {}) {
         return `<!--POTATE_COMMENT_${comments.length - 1}-->`;
       });
 
-      const islandRegex = /<([a-z0-9]+)[^>]*data-island(?:="([^"]*)")?[^>]*>([\s\S]*?)<\/\1>/g;
-      const matches = Array.from(processedHtml.matchAll(islandRegex));
-
       let allIds = new Set();
       let allCss = "";
 
-      // URL (ctx.path) から対象のページコンポーネントを特定する
-      // 例: /about/index.html -> src/pages/about.jsx OR src/pages/about/index.jsx
+      // Identify target page component from URL (ctx.path)
+      // e.g. /about/index.html -> src/pages/about.jsx OR src/pages/about/index.jsx
       let componentPath = null;
       let urlPath = ctx.path;
       
-      const logicalDirname = path.dirname(urlPath).replace(/\\/g, '/');
+      if (virtualId) {
+        const rel = path.relative(viteConfig.root, virtualId).replace(/\\/g, '/');
+        urlPath = '/' + rel;
+      }
 
       urlPath = urlPath.replace(/^\//, '').replace(/index\.html$/, '').replace(/\/$/, '');
       const pagesDir = path.resolve(viteConfig.root, 'src', pageRoot);
@@ -271,98 +389,23 @@ export default function(options = {}) {
         if (componentPath) break;
       }
 
-      if (matches.length === 0 && !componentPath) {
-        return processedHtml.replace(/<!--POTATE_COMMENT_(\d+)-->/g, (_, i) => comments[i]);
-      }
-
-      if (!runner) {
-        if (!devServer && !this._server) {
-          server = await createServer({
-            root: viteConfig.root,
-            configFile: viteConfig.configFile,
-            server: { middlewareMode: true, hmr: false },
-            optimizeDeps: { 
-              noDiscovery: true,
-              include: []
-            },
-            ssr: {
-              external: ['@emotion/css', '@emotion/server']
-            },
-            plugins: [potateVite()]
-          });
-          localServer = server;
-        }
-        const nodeServer = new ViteNodeServer(server);
-        runner = new ViteNodeRunner({
-          root: server.config.root,
-          fetchModule: id => nodeServer.fetchModule(id),
-          resolveId: (id, importer) => nodeServer.resolveId(id, importer),
-        });
-      }
-
       if (componentPath) {
-        processedHtml = processedHtml.replace(/(<[^>]*?[^\s>])\s+data-island(?:="")?([\s>])/, `$1 data-island="${componentPath}"$2`);
-      }
-
-      if (matches.length === 0 && componentPath) {
-        // Full Body Injection Mode (when no data-island is found in HTML)
+        console.log(`[potate] Rendering ${ctx.path} -> ${componentPath}`);
+        // Full Body Injection Mode
         const name = componentPath;
-        const mod = await runner.executeId(`${RUNNER_PUBLIC_ID}:${name}`);
-        const { html: appHtml, css, ids } = await mod.run();
+        const { html: appHtml, css, ids, client } = await ssrRender(name);
         
         ids?.forEach(id => allIds.add(id));
         if (css) allCss += css;
 
         let bodyContent = appHtml;
-        if (mod.client) {
-          bodyContent = `<div data-island="${name}" data-client="${mod.client}">${appHtml}</div>`;
+        if (client) {
+          bodyContent = `<div data-island="${name}" data-client="${client}">${appHtml}</div>`;
         }
         
-        processedHtml = processedHtml.replace(/(<body[^>]*>)([\s\S]*?)(<\/body>)/i, `$1${bodyContent}$3`);
-      } else {
-        // Existing Island Mode (when data-island is present)
-        for (const [fullTag, tagName, rawname, slot] of matches) {
-          const cname = rawname ?? '';
-          let name = cname.endsWith('/') ? cname.slice(0, -1) : cname;
-  
-          if (!name) {
-            if (componentPath) {
-              name = '/' + componentPath;
-            } else {
-              console.warn(`[potate] No component found for route: ${ctx.path}`);
-              continue;
-            }
-          } else if (!name.startsWith('/')) {
-            let sf = name;
-            if (logicalDirname !== '/') sf = `/${name}`;
-            name = logicalDirname + sf;
-          }
-  
-          const mod = await runner.executeId(`${RUNNER_PUBLIC_ID}:${name}`);
-  
-          const { html: appHtml, css, ids } = await mod.run(slot);
-          ids?.forEach(id => allIds.add(id));
-          if (css) allCss += css;
-  
-          const openTagMatch = fullTag.match(/^<[^>]+>/);
-          if (openTagMatch) {
-            let openTag = openTagMatch[0];
-  
-            // コンポーネントから client 設定が export されていれば data-client 属性を注入する
-            if (mod.client) {
-              openTag = openTag.replace(/\s+data-island(?:="[^"]*")?/, ` data-island="${name}"`);
-              if (/data-client/.test(openTag)) {
-                openTag = openTag.replace(/\s+data-client(?:="[^"]*")?/, ` data-client="${mod.client}"`);
-              } else {
-                openTag = openTag.replace(/>$/, ` data-client="${mod.client}">`);
-              }
-            } else {
-              openTag = openTag.replace(/\s+data-island(?:="[^"]*")?/, '');
-            }
-  
-            processedHtml = processedHtml.replace(fullTag, `${openTag}${appHtml}</${tagName}>`);
-          }
-        }
+        processedHtml = processedHtml.replace(/(<body[^>]*>)([\s\S]*?)(<\/body>)/i, (match, start, content, end) => {
+          return `${start}${bodyContent}${end}`;
+        });
       }
 
       let headStyleChildren = false;
@@ -380,6 +423,9 @@ export default function(options = {}) {
         }
       }
 
+      // Restore comments
+      processedHtml = processedHtml.replace(/<!--POTATE_COMMENT_(\d+)-->/g, (_, i) => comments[i]);
+
       // Hybrid?
       if (/\sdata-client(=|[\s>])/.test(processedHtml)) {
 
@@ -394,11 +440,11 @@ export default function(options = {}) {
 
         let src;
         if (ctx?.server) {
-          // Dev mode: Vite dev server handles virtual modules via /@id/
           src = `/@id/${RUNTIME_PUBLIC_ID}`;
         } else if (runtimeRefId) {
-          // Build mode: Emit as a chunk to get a real file path
-          src = path.posix.join(viteConfig.base, this.getFileName(runtimeRefId));
+          try {
+            src = path.posix.join(viteConfig.base, this.getFileName(runtimeRefId));
+          } catch (e) {}
         }
 
         if (src) {
@@ -410,17 +456,7 @@ export default function(options = {}) {
         }
       }
 
-      // Restore comments
-      processedHtml = processedHtml.replace(/<!--POTATE_COMMENT_(\d+)-->/g, (_, i) => comments[i]);
-
       return { html: processedHtml, tags };
     },
-
-    async closeBundle() {
-      if (localServer) {
-        await localServer.close();
-        localServer = null;
-      }
-    }
   }
 }
