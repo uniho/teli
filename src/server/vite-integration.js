@@ -8,6 +8,7 @@ import crypto from 'node:crypto';
 import { ViteNodeServer } from 'vite-node/server';
 import { ViteNodeRunner } from 'vite-node/client';
 import { createServer } from 'vite';
+import { Window } from 'happy-dom';
 
 const pageRoot = 'pages';
 const initName = '_init';
@@ -15,6 +16,14 @@ const initName = '_init';
 export default function(options = {}) {
 
   let viteConfig, devServer, runner, nodeServer, runtimeRefId
+
+  // Polyfill for SSR
+  if (!global.window) {
+    const window = new Window();
+    global.window = window;
+    global.document = window.document;
+    global.HTMLElement = window.HTMLElement;
+  }
 
   const RUNTIME_PUBLIC_ID = 'virtual:potate-runtime';
   const RUNTIME_INTERNAL_ID = '\0' + RUNTIME_PUBLIC_ID;
