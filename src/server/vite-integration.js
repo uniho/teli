@@ -204,8 +204,10 @@ export default function(options = {}) {
         return `
           import { createElement, render } from 'potatejs';
           const initModules = import.meta.glob('/src/${initName}.{js,ts}', { eager: true });
+          console.log(1)
 
           export async function run(mod, clientPath) {
+            console.log(2)
             let globalProps = {};
             for (const path in initModules) {
               const initMod = initModules[path];
@@ -214,6 +216,7 @@ export default function(options = {}) {
 
             const container = document.getElementById('${appId}');
             const Component = mod.default || mod.App || mod.body;
+            console.log(Component)
             const localProps = typeof mod.main === 'function' ? await mod.main() : {};
             const props = { ...globalProps, ...localProps };
             const cache = document.createElement('div');
@@ -258,7 +261,6 @@ export default function(options = {}) {
           import { renderToString, FUNCTIONAL_COMPONENT_NODE } from '${renderToStringPath}';
           import { createElement, render } from 'potatejs';
           import * as mod from '/src/${pageRoot}/${cleanName}';
-          import { Window } from 'happy-dom';
           
           ${globalPropsCode}
 
@@ -276,45 +278,7 @@ export default function(options = {}) {
               };
               let body = renderToString(node);
               const { extractCritical } = await import('@emotion/server');
-
-              const window = new Window();
-              const document = window.document;
-              const clean = (h) => {
-                if (!h) return "";
-                document.body.innerHTML = h;
-                document.body.querySelectorAll('[data-csr-only]').forEach(el => el.remove());
-                return document.body.innerHTML;
-              };
-              body = clean(body);
-              //const head = clean(res.head);
-              const originalWindow = global.window;
-              const originalDocument = global.document;
-              const originalHTMLElement = global.HTMLElement;
-              
-              global.window = window;
-              global.document = document;
-              global.HTMLElement = window.HTMLElement;
-
               return { body, ...extractCritical(body), hydrate };
-              const container = document.createElement('div');
-              render(createElement(Layout, props), container);
-              
-              container.querySelectorAll('[data-csr-only]').forEach(el => el.remove());
-              const body = container.innerHTML;
-
-              let css = '';
-              const ids = [];
-              document.querySelectorAll('style[data-emotion]').forEach(style => {
-                css += style.innerHTML;
-                const data = style.getAttribute('data-emotion').split(' ');
-                ids.push(...data.slice(1));
-              });
-
-              if (originalWindow) global.window = originalWindow; else delete global.window;
-              if (originalDocument) global.document = originalDocument; else delete global.document;
-              if (originalHTMLElement) global.HTMLElement = originalHTMLElement; else delete global.HTMLElement;
-
-              return { body, css, ids, hydrate };
             }
             return { body: '', ids: [], css: '', hydrate: false };
           }
@@ -402,13 +366,28 @@ export default function(options = {}) {
 
         const name = componentPath;
         const { body: appHtml, css, ids, hydrate } = await ssrRender(name);
+
         console.log(css)
+
         hydration = hydrate;
 
         ids?.forEach(id => allIds.add(id));
         if (css) allCss += css;
 
         let content = appHtml;
+
+        // const window = new Window();
+        // const document = window.document;
+        // const clean = (h) => {
+        //   if (!h) return "";
+        //   document.body.innerHTML = h;
+        //   document.body.querySelectorAll('[data-csr-only]').forEach(el => el.remove());
+        //   return document.body.innerHTML;
+        // };
+        // content = clean(content);
+        // //const head = clean(res.head);
+
+
         if (hydrate) content = `<div id="${appId}">${appHtml}</div>`;
 
         if (/<slot\s*\/>/.test(html)) {
