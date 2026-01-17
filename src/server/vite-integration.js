@@ -83,8 +83,8 @@ export default function(options = {}) {
             input[entryName] = virtualPath;
             virtualHtmlMap.add(virtualPath);
 
-            const sourcePath = filePath.replace(/\\/g, '/');
-            input[`js/${entryName}`] = `${ENTRY_PUBLIC_ID}:${sourcePath}`;            
+            // const sourcePath = filePath.replace(/\\/g, '/');
+            // input[`js/${entryName}`] = `${ENTRY_PUBLIC_ID}:${sourcePath}`;            
           }
         }
       };
@@ -191,23 +191,21 @@ export default function(options = {}) {
     },
     
     async load(id) {
-      if (id.startsWith(`${ENTRY_PUBLIC_ID}:`)) {
-        const clientPath = id.substring(`${ENTRY_PUBLIC_ID}:`.length);
-        return `
-          import { run } from '${RUNTIME_PUBLIC_ID}';
-          import * as Client from '${clientPath}';
-          run(Client, '${clientPath}');
-        `;
-      }
-
       if (id === RUNTIME_INTERNAL_ID) {
         return `
           import { createElement, render } from 'potatejs';
+          const pages = import.meta.glob('/src/${pageRoot}/**/*.{jsx,tsx,js,ts}');
           const initModules = import.meta.glob('/src/${initName}.{js,ts}', { eager: true });
-          console.log(1)
 
-          export async function run(mod, clientPath) {
-            console.log(2)
+          async function start() {
+            console.log(1);
+            const self = document.querySelector('script[data-comp]');
+            const compPath = self?.getAttribute('data-comp');
+            if (!compPath || !pages[compPath]) return;
+
+            const mod = await pages[compPath]();
+            console.log(2);
+
             let globalProps = {};
             for (const path in initModules) {
               const initMod = initModules[path];
@@ -216,13 +214,13 @@ export default function(options = {}) {
 
             const container = document.getElementById('${appId}');
             const Component = mod.default || mod.App || mod.body;
-            console.log(Component)
             const localProps = typeof mod.main === 'function' ? await mod.main() : {};
             const props = { ...globalProps, ...localProps };
             const cache = document.createElement('div');
             render(createElement(Component, props), cache);
             container.replaceChildren(...Array.from(cache.childNodes));
           }
+          start();
         `;
       }
 
@@ -291,11 +289,6 @@ export default function(options = {}) {
       // This function will be used in both dev and build
       const ssrRender = async (componentName) => {
         if (devServer) {
-          // Dev mode: Reuse the existing runner after clearing ALL caches.
-          // This is critical to prevent state (like hooks) from leaking between requests.
-          runner.moduleCache.clear();
-          nodeServer.moduleCache.clear();
-
           const mod = await runner.executeId(`${RUNNER_PUBLIC_ID}:${componentName}`);
           return await mod.run();
         } else {
@@ -353,6 +346,7 @@ export default function(options = {}) {
       for (const basePath of searchPaths) {
         for (const ext of extensions) {
           if (fs.existsSync(basePath + ext)) {
+            clientPath = '/src/' + path.relative(path.join(viteConfig.root, 'src'), basePath + ext).replace(/\\/g, '/');
             componentPath = path.relative(path.join(viteConfig.root, 'src', pageRoot), basePath + ext).replace(/\\/g, '/').replace(/\.[^/.]+$/, "");
             break;
           }
@@ -424,28 +418,17 @@ export default function(options = {}) {
 
       // Hybrid?
       if (hydration) {
-
         let src;
-        if (clientPath) {
-          const entryId = `${ENTRY_PUBLIC_ID}:${clientPath}`;
-          src = ctx?.server ? `/@id/${entryId}` : entryId;
+        if (devServer) {
+          src = `/@id/${RUNTIME_PUBLIC_ID}`;
         } else {
-          if (ctx?.server) {
-            src = `/@id/${RUNTIME_PUBLIC_ID}`;
-          } else if (runtimeRefId) {
-            try {
-              src = path.posix.join(viteConfig.base, this.getFileName(runtimeRefId));
-            } catch (e) {}
-          }
+          src = path.posix.join(viteConfig.base, this.getFileName(runtimeRefId));
         }
-
-        if (src) {
-          tags.push({
-            tag: 'script',
-            attrs: { type: 'module', src },
-            injectTo: 'body'
-          });
-        }
+        tags.push({ 
+          tag: 'script', 
+          attrs: { type: 'module', src, 'data-comp': clientPath }, 
+          injectTo: 'body' 
+        });        
       }
 
       return { html: processedHtml, tags };
