@@ -8,7 +8,6 @@ import crypto from 'node:crypto';
 import { ViteNodeServer } from 'vite-node/server';
 import { ViteNodeRunner } from 'vite-node/client';
 import { createServer } from 'vite';
-import getViteRuntime from './vite-runtime.js';
 
 const pageRoot = 'pages';
 const initName = '_init';
@@ -19,6 +18,7 @@ export default function(options = {}) {
 
   const RUNTIME_PUBLIC_ID = 'virtual:potate-runtime';
   const RUNTIME_INTERNAL_ID = '\0' + RUNTIME_PUBLIC_ID;
+  const ENTRY_PUBLIC_ID = 'virtual:potate-entry';
 
   const RUNNER_PUBLIC_ID = 'virtual:potate-runner';
   
@@ -80,6 +80,9 @@ export default function(options = {}) {
             const virtualPath = path.resolve(root, `${entryName}.html`);
             input[entryName] = virtualPath;
             virtualHtmlMap.add(virtualPath);
+
+            const sourcePath = filePath.replace(/\\/g, '/');
+            input[`js/${entryName}`] = `${ENTRY_PUBLIC_ID}:${sourcePath}`;            
           }
         }
       };
@@ -175,41 +178,49 @@ export default function(options = {}) {
         });
       }
     },
-    
+
     resolveId(id) {
       if (id === RUNTIME_PUBLIC_ID) return RUNTIME_INTERNAL_ID;
+      if (id.startsWith(ENTRY_PUBLIC_ID)) return id;
       if (id.startsWith(`${RUNNER_PUBLIC_ID}:`)) return '\0' + id;
       if (virtualHtmlMap.has(id)) {
         return id;
       }
     },
     
-    load(id) {
+    async load(id) {
+      if (id.startsWith(`${ENTRY_PUBLIC_ID}:`)) {
+        const clientPath = id.substring(`${ENTRY_PUBLIC_ID}:`.length);
+        return `
+          import { run } from '${RUNTIME_PUBLIC_ID}';
+          import * as Client from '${clientPath}';
+          run(Client, '${clientPath}');
+        `;
+      }
+
       if (id === RUNTIME_INTERNAL_ID) {
-        const clientModules = [];
-        const pagesDir = path.resolve(viteConfig.root, `src/${pageRoot}`);
+        return `
+          import { createElement, render } from 'potatejs';
+          const initModules = import.meta.glob('/src/${initName}.{js,ts}', { eager: true });
 
-        const scanDirForClientModules = (dir, base = '') => {
-          if (!fs.existsSync(dir)) return;
-          const files = fs.readdirSync(dir, { withFileTypes: true });
+          export async function run(mod, clientPath) {
+            let globalProps = {};
+            for (const path in initModules) {
+              const initMod = initModules[path];
+              if (typeof initMod.main === 'function') globalProps = await initMod.main();
+            }
 
-          for (const file of files) {
-            const filePath = path.join(dir, file.name);
-
-            if (file.isDirectory()) {
-              if (file.name.startsWith('_')) continue;
-              scanDirForClientModules(filePath, path.join(base, file.name));
-            } else if (/\.(jsx|tsx|js|ts)$/.test(file.name)) {
-              if (file.name.startsWith('_')) continue;
-              
-              const relativePath = path.join(base, file.name).replace(/\\/g, '/');
-              const importPath = `/src/${pageRoot}/${relativePath}`;
-              clientModules.push(`'${importPath}': () => import('${importPath}')`);
+            const islands = document.querySelectorAll(\`[data-client="\${clientPath}"]\`);
+            for (const el of islands) {
+              const Component = mod.default || mod.App;
+              const localProps = typeof mod.main === 'function' ? await mod.main() : {};
+              const props = { ...globalProps, ...localProps };
+              const cache = document.createElement('div');
+              render(createElement(Component, props), cache);
+              el.replaceChildren(...Array.from(cache.childNodes));
             }
           }
-        };
-        scanDirForClientModules(pagesDir);
-        return getViteRuntime({ initName, pageRoot, clientModules });
+        `;
       }
 
       if (virtualHtmlMap.has(id)) {
@@ -221,6 +232,7 @@ export default function(options = {}) {
       if (id.startsWith(`\0${RUNNER_PUBLIC_ID}:`)) {
         const name = id.substring(`\0${RUNNER_PUBLIC_ID}:`.length);
         const cleanName = name.startsWith('/') ? name.slice(1) : name;
+        const dirName = path.dirname(cleanName).replace(/\\/g, '/');
         
         let initImportPath = null;
         const extensions = ['.js', '.ts', '.jsx', '.tsx', '.mjs', '.mts'];
@@ -246,11 +258,9 @@ export default function(options = {}) {
           import { renderToString, FUNCTIONAL_COMPONENT_NODE } from '${renderToStringPath}';
           import * as mod from '/src/${pageRoot}/${cleanName}';
           
-          export const client = mod.client;
-
           ${globalPropsCode}
 
-          export const run = async (slot) => {
+          export const run = async () => {
             const globalProps = await getGlobalProps();
             const pageProps = typeof mod.main === 'function' ? await mod.main() : {};
             const props = { ...globalProps, ...pageProps };
@@ -263,45 +273,36 @@ export default function(options = {}) {
                 props: { ...props }
               };
               let html = renderToString(node);
-              
-              const nestedIslandRegex = /<([a-z0-9]+)([^>]*?)\\s+data-island(?:="([^"]*)")?([^>]*?)>([\\s\\S]*?)<\\/\\1>/gi;
-              const matches = Array.from(html.matchAll(nestedIslandRegex));
-              let newHtml = '';
-              let lastIndex = 0;
-              
+              let island = null;
+
+              const matches = html.matchAll(/data-client(?:="([^"]*)")?/g);
+              const islands = [];
+
               for (const match of matches) {
-                const [fullTag, tagName, attrsBefore, exportNameRaw, attrsAfter, content] = match;
-                newHtml += html.substring(lastIndex, match.index);
-                const exportName = exportNameRaw || 'default';
-                const Component = exportName === 'default' ? (mod.App || mod.default) : mod[exportName];
-                if (Component) {
-                  const compNode = { nodeType: FUNCTIONAL_COMPONENT_NODE, type: Component, props: { ...props, children: content ? { innerHTML: content } : undefined } };
-                  const compHtml = renderToString(compNode);
-                  const hasClient = /data-client/.test(attrsBefore) || /data-client/.test(attrsAfter);
-                  const newIslandValue = exportName === 'default' ? '${name}' : '${name}:' + exportName;
-                  const islandAttr = hasClient ? \` data-island="\${newIslandValue}"\` : '';
-                  newHtml += \`<\${tagName}\${attrsBefore}\${islandAttr}\${attrsAfter}>\${compHtml}</\${tagName}>\`;
+                let clientRes;
+                const val = match[1];
+                
+                if (!val) {
+                  clientRes = \`/src/${pageRoot}/${cleanName}\`;
+                } else if (val.startsWith('/')) {
+                  clientRes = \`/src/${pageRoot}${val}\`; 
                 } else {
-                  newHtml += fullTag;
+                  const base = '${dirName}' === '.' ? '' : '${dirName}/';
+                  clientRes = '/src/${pageRoot}/' + base + val;
                 }
-                lastIndex = match.index + fullTag.length;
+
+                if (!islands.find(is => is.js === clientRes)) {
+                  islands.push({ js: clientRes, client: val || 'load' });
+                }
+                
+                html = html.replace(match[0], \`data-client="${clientRes}"\`);
               }
-              newHtml += html.substring(lastIndex);
+
               const { extractCritical } = await import('@emotion/server');
-              return { html: newHtml, ...extractCritical(newHtml) };
-            } else {
-              // Fallback: Treat default export as main content if no island export exists
-              // This allows simple pages to work with just export default
-              const Component = mod.App || mod.default;
-              if (Component) {
-                const node = { nodeType: FUNCTIONAL_COMPONENT_NODE, type: Component, props: { ...props, children: slot ? { innerHTML: slot } : undefined } };
-                const html = renderToString(node);
-                const { extractCritical } = await import('@emotion/server');
-                return { html, ...extractCritical(html) };
-              }
-              return { html: slot || '', ids: [], css: '' };
+              return { html, ...extractCritical(html), islands };
             }
-          };
+            return { html: '', ids: [], css: '', island: null };
+          }
         `;
       }
     },
@@ -311,7 +312,7 @@ export default function(options = {}) {
       let server = ctx?.server;
 
       // This function will be used in both dev and build
-      const ssrRender = async (componentName, slot) => {
+      const ssrRender = async (componentName) => {
         if (devServer) {
           // Dev mode: Reuse the existing runner after clearing ALL caches.
           // This is critical to prevent state (like hooks) from leaking between requests.
@@ -319,8 +320,7 @@ export default function(options = {}) {
           nodeServer.moduleCache.clear();
 
           const mod = await runner.executeId(`${RUNNER_PUBLIC_ID}:${componentName}`);
-          const result = await mod.run(slot);
-          return { ...result, client: mod.client };
+          return await mod.run();
         } else {
           // Build mode: Create a temporary, isolated server and runner for each page.
           const serverForRender = await createServer({
@@ -335,8 +335,7 @@ export default function(options = {}) {
             const nodeServerForRender = new ViteNodeServer(serverForRender);
             const nodeRunnerForRender = new ViteNodeRunner({ root: serverForRender.config.root, fetchModule: id => nodeServerForRender.fetchModule(id), resolveId: (id, importer) => nodeServerForRender.resolveId(id, importer) });
             const mod = await nodeRunnerForRender.executeId(`${RUNNER_PUBLIC_ID}:${componentName}`);
-            const result = await mod.run(slot);
-            return { ...result, client: mod.client };
+            return await mod.run();
           } finally {
             await serverForRender.close();
           }
@@ -359,6 +358,7 @@ export default function(options = {}) {
 
       let allIds = new Set();
       let allCss = "";
+      let clientPath = null;
 
       // Identify target page component from URL (ctx.path)
       // e.g. /about/index.html -> src/pages/about.jsx OR src/pages/about/index.jsx
@@ -389,18 +389,21 @@ export default function(options = {}) {
         if (componentPath) break;
       }
 
+      let activeIsland = [];
       if (componentPath) {
         console.log(`[potate] Rendering ${ctx.path} -> ${componentPath}`);
-        // Full Body Injection Mode
+
         const name = componentPath;
-        const { html: appHtml, css, ids, client } = await ssrRender(name);
-        
+        const { html: appHtml, css, ids, island } = await ssrRender(name);
+        activeIsland = island;
+
         ids?.forEach(id => allIds.add(id));
         if (css) allCss += css;
 
         let bodyContent = appHtml;
-        if (client) {
-          bodyContent = `<div data-island="${name}" data-client="${client}">${appHtml}</div>`;
+        if (island) {
+          clientPath = island.js;
+          bodyContent = `<div data-island="${name}" data-client="${island.client}">${appHtml}</div>`;
         }
         
         processedHtml = processedHtml.replace(/(<body[^>]*>)([\s\S]*?)(<\/body>)/i, (match, start, content, end) => {
@@ -427,7 +430,7 @@ export default function(options = {}) {
       processedHtml = processedHtml.replace(/<!--POTATE_COMMENT_(\d+)-->/g, (_, i) => comments[i]);
 
       // Hybrid?
-      if (/\sdata-client(=|[\s>])/.test(processedHtml)) {
+      if (activeIsland) {
 
         if (headStyleChildren !== false) {
           tags.push({
@@ -439,12 +442,17 @@ export default function(options = {}) {
         }
 
         let src;
-        if (ctx?.server) {
-          src = `/@id/${RUNTIME_PUBLIC_ID}`;
-        } else if (runtimeRefId) {
-          try {
-            src = path.posix.join(viteConfig.base, this.getFileName(runtimeRefId));
-          } catch (e) {}
+        if (clientPath) {
+          const entryId = `${ENTRY_PUBLIC_ID}:${clientPath}`;
+          src = ctx?.server ? `/@id/${entryId}` : entryId;
+        } else {
+          if (ctx?.server) {
+            src = `/@id/${RUNTIME_PUBLIC_ID}`;
+          } else if (runtimeRefId) {
+            try {
+              src = path.posix.join(viteConfig.base, this.getFileName(runtimeRefId));
+            } catch (e) {}
+          }
         }
 
         if (src) {
