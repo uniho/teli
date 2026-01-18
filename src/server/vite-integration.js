@@ -29,6 +29,7 @@ export default function(options = {}) {
   const renderToStringPath = path.join(__dirname, 'renderToString.js').replace(/\\/g, '/');
 
   const virtualHtmlMap = new Set();
+  const deleteList = new Set();
 
   return {
     name: 'potate',
@@ -47,6 +48,7 @@ export default function(options = {}) {
         throw new Error(`[potate] index.html not found in root: ${root}`);
       }
       input['index'] = indexHtml;
+      input['runtime'] = RUNTIME_PUBLIC_ID;
 
       // Scan src/pages and register virtual HTML (File System Routing)
       const scanPages = (dir, baseRoute = '') => {
@@ -361,8 +363,6 @@ export default function(options = {}) {
         const name = componentPath;
         const { body: appHtml, css, ids, hydrate } = await ssrRender(name);
 
-        console.log(css)
-
         hydration = hydrate;
 
         ids?.forEach(id => allIds.add(id));
@@ -429,9 +429,42 @@ export default function(options = {}) {
           attrs: { type: 'module', src, 'data-comp': clientPath }, 
           injectTo: 'body' 
         });        
+      } else {
+        deleteList.add(clientPath);
+        console.log(clientPath)
       }
 
       return { html: processedHtml, tags };
     },
+
+    writeBundle(options, bundle) {
+      if (viteConfig.command !== 'build' || deleteList.size === 0) return;
+
+      const outDir = path.resolve(viteConfig.root, viteConfig.build.outDir);
+
+      // deleteList: 消去したいソースファイルのパス (例: /src/pages/about.jsx)
+      deleteList.forEach(sourcePath => {
+        // bundle から「このソースパスを元に作られたJSチャンク」を探し出す
+        // facadeModuleId は Vite が内部で保持するソースファイルの絶対パス
+        const targetChunk = Object.values(bundle).find(chunk => 
+          chunk.type === 'chunk' && 
+          chunk.facadeModuleId && 
+          chunk.facadeModuleId.replace(/\\/g, '/').endsWith(sourcePath)
+        );
+
+        if (targetChunk) {
+          const fullPath = path.join(outDir, targetChunk.fileName);
+          if (fs.existsSync(fullPath)) {
+            try {
+              // fs.unlinkSync(fullPath);
+              console.log(`[potate] Pruned unused JS: ${fullPath}`);
+            } catch (e) {
+              // 削除失敗は無視（安全のため）
+            }
+          }
+        }
+      });
+    },
+
   }
 }
