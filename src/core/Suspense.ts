@@ -194,10 +194,15 @@ class SuspenseManager {
     const isSuspenseList = component instanceof SuspenseList;
 
     if (isSuspenseList) {
-      return this.handleSuspenseList();
+      return this.handleSuspenseList().catch(() => {
+        // Prevent unhandled rejection
+      });
     }
 
-    return Promise.resolve(suspender).then(this.resolve.bind(this, suspender));
+    return Promise.resolve(suspender).then(
+      this.resolve.bind(this, suspender),
+      this.resolve.bind(this, suspender),
+    );
   }
 
   isUnresolved() {
@@ -380,7 +385,7 @@ class SuspenseManager {
 
     // resolve the child managers based on reveal order
     const handleManagerInOrder = (promise, manager) => {
-      return promise.then(() => {
+      const next = () => {
         /**
          * If we are doing forward reveal order and have mentioned
          * tail to be collapsed we need to mark the next manager as dirty
@@ -391,7 +396,8 @@ class SuspenseManager {
         }
 
         return manager.handleSuspense();
-      });
+      };
+      return promise.then(next, next);
     };
 
     /**
@@ -407,9 +413,10 @@ class SuspenseManager {
      * in the provided order event the promise resolves concurrently
      */
     if (revealOrder === 'together') {
-      allSuspenderPromise.then(() => {
+      const next = () => {
         childManagers.forEach((manager) => manager.handleSuspense());
-      });
+      };
+      allSuspenderPromise.then(next, next);
     } else if (revealOrder === 'forwards') {
       let promise = resolvedPromise;
       for (let i = 0, ln = childManagers.length; i < ln; i++) {
