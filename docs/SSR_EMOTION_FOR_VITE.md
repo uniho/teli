@@ -190,7 +190,7 @@ export default props => (
 
 ### Using pure Vite-standard CSR Only
 
-By specifying clientOnly: true in the Potate plugin, it functions as a standard Vite CSR-only application.
+By specifying `clientOnly: true` in the Potate plugin, it functions as a standard Vite CSR-only application.
 
 ``` js
 import { defineConfig } from 'vite'
