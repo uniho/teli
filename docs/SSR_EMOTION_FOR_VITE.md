@@ -197,7 +197,9 @@ import { defineConfig } from 'vite'
 import potate from 'potatejs/vite'
 
 export default defineConfig({
-  plugins: [potate()],
+  plugins: [potate({
+    clientOnly: true,
+  })],
 })
 
 ```

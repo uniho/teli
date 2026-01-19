@@ -81,12 +81,16 @@ npm install potatejs
 
 Add Potate in your `vite.config.ts` file.
 
+> **Note:** What is the `clientOnly` option? See [SSR Emotion for Vite](/docs/SSR_EMOTION_FOR_VITE.md#using-pure-vite-standard-csr-only).
+
 ``` js
 import { defineConfig } from 'vite'
 import potate from 'potatejs/vite'
 
 export default defineConfig({
-  plugins: [potate()],
+  plugins: [potate({
+    clientOnly: true,
+  })],
 })
 
 ```
