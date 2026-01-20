@@ -315,6 +315,14 @@ export default function(options = {}) {
       return { html: newHtml, tags };
     },
 
+fix: invalidate vite-node runner cache on hot update
+    handleHotUpdate({ file, server, modules }) {
+      if (csrOnly) return;
+      if (runner) {
+        runner.moduleCache.clear();
+      }
+    },
+
     writeBundle(options, bundle) {
       // Remove unused JS
       if (viteConfig.command !== 'build' || deleteList.size === 0) return;
