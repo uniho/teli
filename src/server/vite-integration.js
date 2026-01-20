@@ -315,7 +315,6 @@ export default function(options = {}) {
       return { html: newHtml, tags };
     },
 
-fix: invalidate vite-node runner cache on hot update
     handleHotUpdate({ file, server, modules }) {
       if (csrOnly) return;
       if (runner) {
