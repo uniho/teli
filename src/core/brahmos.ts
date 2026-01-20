@@ -111,6 +111,13 @@ export function reacty(...Components: any[]) {
   });
 }
 
+export const __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: any = {};
+
+let isSSRValue = false;
+export const isSSR: () => boolean = () => isSSRValue;
+__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
+  .setIsSSR = (value: boolean) => (isSSRValue = value);
+
 /** Export transforms */
 export const jsx = createBrahmosNode;
 export const jsxs = createBrahmosNode;
@@ -134,7 +141,7 @@ export { html };
  */
 import { setCurrentComponentFiber } from './fiber';
 import functionalComponentInstance from './functionalComponentInstance';
-export const __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED = {
-  setCurrentComponentFiber,
-  functionalComponentInstance,
-};
+__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
+  .setCurrentComponentFiber = setCurrentComponentFiber;
+__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
+  .functionalComponentInstance = functionalComponentInstance;

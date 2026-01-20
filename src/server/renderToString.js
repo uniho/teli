@@ -63,7 +63,7 @@ function attributesToString(attributes) {
   return str;
 }
 
-export function renderToString(node) {
+function renderNode(node) {
   if (node === null || node === undefined || typeof node === 'boolean') {
     return '';
   }
@@ -78,7 +78,7 @@ export function renderToString(node) {
   }
 
   if (Array.isArray(node)) {
-    return node.map(renderToString).join('');
+    return node.map(renderNode).join('');
   }
 
   if (isComponentNode(node)) {
@@ -112,7 +112,7 @@ export function renderToString(node) {
         child = Component(props);
       }
 
-      return renderToString(child);
+      return renderNode(child);
     }
   }
 
@@ -126,7 +126,7 @@ export function renderToString(node) {
       html += ' />';
     } else {
       html += '>';
-      if (props.children) html += renderToString(props.children);
+      if (props.children) html += renderNode(props.children);
       html += `</${tag}>`;
     }
     return html;
@@ -147,7 +147,7 @@ export function renderToString(node) {
       if (meta.isAttribute) {
         html += attributesToString(value);
       } else {
-        html += renderToString(value);
+        html += renderNode(value);
       }
 
       html += strings[i + 1];
@@ -157,6 +157,17 @@ export function renderToString(node) {
   }
 
   return '';
+}
+
+export function renderToString(node) {
+  const { setIsSSR } = Potate.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED || {};
+  const previousIsSSR = Potate.isSSR ? Potate.isSSR() : false;
+  if (setIsSSR) setIsSSR(true);
+  try {
+    return renderNode(node);
+  } finally {
+    if (setIsSSR) setIsSSR(previousIsSSR);
+  }
 }
 
 export { FUNCTIONAL_COMPONENT_NODE };

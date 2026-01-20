@@ -1,6 +1,31 @@
 
 # Potate API Documentation
 
+## `isSSR()`
+
+This function returns `true` if the component is currently being rendered in SSR.
+
+> **Note:** Please be aware that this is a function call, not a boolean property.
+
+> **Note:** During SSR, the `Suspense` component and its child components will be removed from the output.
+
+```jsx
+import Potate from 'potatejs'
+
+const MyComponent = props => {
+  if (Potate.isSSR()) {
+    return (<div>SSR!</div>)
+  }
+
+  return (
+    <Potate.Suspense>
+      <div>Hybrid or CSR!</div>
+    </Potate.Suspense>
+  )
+}
+
+```
+
 ## `reacty(...ReactComponent)`
 
 Declares that components created for React will be used within Potate. Once a component is marked as a React component, all of its descendants (children) are also treated as React components. You can pass multiple components as arguments to mark them all at once.
