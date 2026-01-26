@@ -189,7 +189,7 @@ export const styled = (Tag) => (style, ...values) => props => {
   const makeClassName = (style, ...values) =>
     typeof style == 'function' ? makeClassName(style(props)) : css(style, ...values);
  
-  const {sx, 'class': _class, children, ...wosx} = props;
+  const {as: As, sx, className, 'class': _class, children, ...wosx} = props;
 
   // cleanup transient props
   Object.keys(wosx).forEach(key => {
@@ -198,10 +198,11 @@ export const styled = (Tag) => (style, ...values) => props => {
 
   const newProps = {
     ...wosx,
-    'class': cx(makeClassName(style, ...values), makeClassName(sx), _class),
+    class: cx(makeClassName(style, ...values), makeClassName(sx), _class, className),
   };
 
-  return (<Tag {...newProps}>{children}</Tag>);
+  const T = As || Tag;
+  return (<T {...newProps}>{children}</T>);
 };
 
 ```
@@ -210,25 +211,22 @@ What is the sx prop? For those unfamiliar with libraries like [MUI, the sx prop]
 
 In this implementation, you can pass raw style objects to the sx prop without wrapping them in `css()` or "The Patterns" functions.
 
-However, since the underlying tag of a button is not always `<button>`, and because using something like `createElement()` locally is generally not recommended, I personally prefer the approach shown below. In any case, how you choose to implement this is entirely up to you.
+However, defining a `styled` component inside a render function is **a pitfall** because it creates a new component identity every time, forcing React to re-mount.
+I personally prefer the approach shown below. In any case, how you choose to implement this is entirely up to you.
 
 ```js
-// the-sx-prop.js
+// the-sx-prop.jsx
 
 import {css, cx} from '@emotion/css'
 
-const sx = (props, ...styles) => {
-  const result = typeof props === 'object' ? {...props} : {};
-  const _css = [];
-  for (let arg of styles) {
-    if (typeof arg === 'function') {
-      _css.push(arg(result));
-    } else if (arg) {
-      _css.push(arg);
-    }
+export const sx = (props, style, ...values) => {
+  let result = (props && typeof props === 'object' ? props : {});
+  if (typeof style === 'function') {
+    result = {...style(result), ...result};
+    result.class = cx(css(result?.$css, ...values), result.class);
+  } else {
+    result.class = cx(css(style, ...values), result.class);
   }
-
-  result.class = cx(css(_css), result.class);
 
   // cleanup transient props
   Object.keys(result).forEach(key => {
@@ -238,12 +236,11 @@ const sx = (props, ...styles) => {
   return result;
 }
 
-export default sx;
-
-// Factory for component-scoped sx functions
+// Factory for component-scoped sx functions (adds `.css()` automatically)
 sx._factory = (genCSS) => {
-  const f = (props, ...styles) => sx(props, ...styles, genCSS);
-  f.css = (...styles) => f({}, ...styles); // Styles-only function when you don't need props
+  const f = (props, ...styles) => sx(props || {}, genCSS, ...styles);
+  f.css = (...styles) => f({}, ...styles); // style only
+  // f.curry = (props) => (...values) => f(props || {}, ...values); // currying
   return f;
 }
 
@@ -267,7 +264,7 @@ sx.button = sx._factory(props => {
     style.boxShadow = 'var(--style-shadows-level1)';
   }
 
-  return [
+  return {$css: [
     css`
       line-height: 1;
       display: inline-flex;
@@ -278,13 +275,13 @@ sx.button = sx._factory(props => {
       }
     `,
     style,
-  ];
+  ]};
 });
 
 ```
 
 ```jsx
-import sx from './the-sx-prop'
+import {sx} from './the-sx-prop'
 
 export default props => {
   return (<>
@@ -295,6 +292,58 @@ export default props => {
   <button disabled {...sx.button.css({margin: '1rem'})}>Button4</button>
   <button {...sx.button({disabled: true}, {margin: '1rem'})}>Button5</button>
   </>);
+}
+
+```
+
+Furthermore, by creating a component like the one below, you evolve into a **Super Saiyan** (for those who aren't familiar, it's like a classic Superman).
+
+```js
+// the-sx-prop.jsx
+
+:
+:
+
+export const As = ({as: Tag = 'div', children, ...props}) => <Tag {...props}>{children}</Tag>;
+
+// My list style
+sx.ul = sx._factory(props => ({
+  as: 'ul',
+  $css: css`
+  & > li {
+    position: relative;
+    padding-left: 1.5rem;
+
+    &:before {
+      content: "\\2022";
+      position: absolute;
+      width: 1.5rem;
+      left: 0; top: 0;
+      text-align: center;
+    }
+    & + li, & > ul {
+      margin-top: .25rem;
+    }
+  }
+  & > ul {
+    margin-left: 1rem;
+  }
+`}));
+
+```
+
+```jsx
+import {sx, As} from './the-sx-prop'
+
+const MyComponent = props => {
+  return (
+  <As {...sx.ul.css({ padding: '20px', border: '1px solid #ccc' })}>
+    <li>Is it Flexible?</li>
+    <li>Is it Dynamic?</li>
+    <li>Is it Polymorphic?</li>
+    <li>No, it's <strong>As</strong>!</li>
+  </As>
+  )
 }
 
 ```
