@@ -157,9 +157,9 @@ const isBP = value => value in BP
 const _gt = bp => `(min-width: ${isBP(bp) ? BP[bp] : bp})`
 const _lt = bp => `(max-width: ${isBP(bp) ? BP[bp] : bp})`
 
-const gt = (bp, ...args) => css({[`@media ${_gt(bp)}`]: args})
-const lt = (bp, ...args) => css({[`@media ${_lt(bp)}`]: args})
-const bw = (min, max, ...args) => css({[`@media ${_gt(min)} and ${_lt(max)}`]: args})
+const gt = (bp, ...args) => css({[`@media ${_gt(bp)}`]: css(...args)})
+const lt = (bp, ...args) => css({[`@media ${_lt(bp)}`]: css(...args)})
+const bw = (min, max, ...args) => css({[`@media ${_gt(min)} and ${_lt(max)}`]: css(...args)})
 
 export default props => (
   <div class={css(
